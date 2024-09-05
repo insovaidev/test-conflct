@@ -1,0 +1,23 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "push": "git add . && git commit -m 'justpush' && git push origin master"
+  },
+  "dependencies": {
+    "nuxt": "^3.11.1",
+    "nuxt-gtag": "^2.1.0",
+    "nuxt-jsonld": "^2.0.8",
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@nuxtjs/tailwindcss": "^6.11.4"
+  }
+}
