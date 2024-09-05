@@ -1,14 +1,17 @@
 <template>
   <div>
     <p>details post</p>
+    <pre>{{ dataPostDetial }}</pre>
   </div>
 </template>
 
 <script setup>
-const dataPostDetial = refs("");
+const route = useRoute()
+const dataPostDetial = ref('');
+const baseApiUrl = `http://localhost:1234/`
 
 useHead({
-  title: dataPostDetial.value ? dataPostDetial.value.title : tt,
+  title: dataPostDetial.value ? dataPostDetial.value.title : '',
   meta: [
     {
       name: "keywords",
@@ -64,6 +67,16 @@ useHead({
   ],
 });
 
-const { data: dataRespone } = useFetch(`http;`)
+
+const id = route.params.id
+const title = route.params.title
+
+
+
+const { data: dataRespone } = useFetch(`${baseApiUrl}api/posts/${id}`)
+
+if (dataRespone.value) {
+   dataPostDetial.value = dataRespone.value
+}
 
 </script>
