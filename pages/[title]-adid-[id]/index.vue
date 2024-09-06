@@ -10,7 +10,7 @@
 
 <script setup>
 const route = useRoute()
-const dataPostDetial = ref('');
+const dataPostDetial = useState('dataPostDetial', () => '')
 // const baseApiUrl = `http://localhost:1234/`
 const baseApiUrl = `https://test-post-share-api.onrender.com/`
 
@@ -68,22 +68,27 @@ useHead({
   ],
 });
 
-
 const id = route.params.id
 const title = route.params.title
 
-const getPostDetail = async () => {
-   try {
-      const res = await $fetch(`${baseApiUrl}api/posts/${id}`)
-      if (res) {
-        dataPostDetial.value = res  
-      }
-   } catch (error) {
-      console.error(error)
-   }
-}
+const { data: dataPostRespone } = await useFetch(`${baseApiUrl}api/posts/${id}`)
 
+dataPostDetial.value = dataPostRespone.value
 
-getPostDetail()
+// console.log('serve side', data.value)
+
+// const getPostDetail = async () => {
+//    try {
+//       const res = await $fetch(`${baseApiUrl}api/posts/${id}`)
+//       if (res) {
+//         dataPostDetial.value = res  
+//       }
+//    } catch (error) {
+//       console.error(error)
+//    }
+// }
+
+// getPostDetail()
+
 
 </script>
