@@ -1,14 +1,21 @@
    <template>
   <div class="p-4">
     <div
-      @click="toDetail(post.data.title, post.data.id)"
+      
       :key="post"
       v-for="post in dataPosts"
       class="list_post"
     >
+
+    <div @click="toDetail(post.data.title, post.data.id)" class="border-[1px] rounded-md mb-2 p-2">
+
       <p>{{ post.data.id }}</p>
       <p>{{ post.data.title }}</p>
-      <button @click="share(post)">Shere</button>
+    </div>
+
+
+
+      <button class="" @click="share(post)">Shere</button>
     </div>
   </div>
 </template>
@@ -62,9 +69,10 @@ onMounted(() => {
 
    <style >
 .list_post {
+  position: relative;
   border: 1px solid lightblue;
   padding: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 3rem;
   border-radius: 8px;
 }
 </style>
