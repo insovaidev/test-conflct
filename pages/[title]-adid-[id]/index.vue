@@ -8,7 +8,8 @@
 <script setup>
 const route = useRoute()
 const dataPostDetial = ref('');
-const baseApiUrl = `http://localhost:1234/`
+// const baseApiUrl = `http://localhost:1234/`
+const baseApiUrl = `https://test-post-share-api.onrender.com/`
 
 useHead({
   title: dataPostDetial.value ? dataPostDetial.value.meta.title : '',
@@ -72,9 +73,9 @@ const title = route.params.title
 
 const getPostDetail = async () => {
    try {
-      const res = await $fetch(`http://localhost:1234/api/posts/${id}`)
+      const res = await $fetch(`${baseApiUrl}api/posts/${id}`)
       if (res) {
-        dataPostDetial.value = res
+        dataPostDetial.value = res  
       }
    } catch (error) {
       console.error(error)
