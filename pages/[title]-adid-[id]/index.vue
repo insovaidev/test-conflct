@@ -1,6 +1,7 @@
 <template>
   <div>
     <p>details post</p>
+    <button @click="share(dataPostDetial)">Shere</button>
     <img :src="dataPostDetial?.meta?.image ?? ''" alt="">
     <img src="https://images.khmer24.co/24-09-04/scoopy-i-015--775039172541923673824722-b.jpg" alt="">
     <pre>{{ dataPostDetial?.meta ?? ''}}</pre>
@@ -47,7 +48,7 @@ useHead({
     },
     {
       property: "og:image",
-      content: dataPostDetial.value.meta?.image ?? "https://images.khmer24.co/24-09-04/scoopy-i-015--775039172541923673824722-b.jpg",
+      content: dataPostDetial.value?.meta?.image ?? "",
     },
     { property: "og:image:width", content: "600" },
     { property: "og:image:height", content: "600" },
@@ -90,5 +91,26 @@ console.log('serve side', dataPostDetial.value.meta)
 
 // getPostDetail()
 
+
+const share = async (post) => {
+  if (navigator.share) {
+    try {
+      const dataShare = {
+        title: post.data.title ?? "",
+        text: "Check out this amazing content!",
+        url: post.data.short_link || "",
+      };
+
+      await navigator.share({
+        ...dataShare,
+      });
+      console.log("Content shared successfully!");
+    } catch (error) {
+      console.error("Error sharing:", error);
+    }
+  } else {
+    alert("Sharing not supported in your browser");
+  }
+};
 
 </script>
