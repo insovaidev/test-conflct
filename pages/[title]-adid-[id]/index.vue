@@ -67,10 +67,8 @@ useHead({
   ],
 });
 
-
 const id = route.params.id
 const title = route.params.title
-
 
 
 const { data: dataRespone } = useFetch(`${baseApiUrl}api/posts/${id}`)

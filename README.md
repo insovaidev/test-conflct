@@ -1,7 +1,5 @@
-# Features of this repos
-- Google analytic
-- Structure content by use nuxt-jsonld.
+## Share Content
 
-my-test1724645547377
-my-test1724645554409
-my-test1724645557513
+- setup page that have thumnail from post image || default 
+
+
