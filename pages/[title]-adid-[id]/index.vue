@@ -47,7 +47,7 @@ useHead({
     },
     {
       property: "og:image",
-      content: dataPostDetial.value?.meta?.image ?? "https://images.khmer24.co/24-09-04/scoopy-i-015--775039172541923673824722-b.jpg",
+      content: dataPostDetial.value.meta?.image ?? "https://images.khmer24.co/24-09-04/scoopy-i-015--775039172541923673824722-b.jpg",
     },
     { property: "og:image:width", content: "600" },
     { property: "og:image:height", content: "600" },
@@ -75,7 +75,7 @@ const { data: dataPostRespone } = await useFetch(`${baseApiUrl}api/posts/${id}`)
 
 dataPostDetial.value = dataPostRespone.value
 
-// console.log('serve side', data.value)
+console.log('serve side', dataPostDetial.value.meta)
 
 // const getPostDetail = async () => {
 //    try {
