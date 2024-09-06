@@ -6,15 +6,10 @@
       v-for="post in dataPosts"
       class="list_post"
     >
-
     <div @click="toDetail(post.data.title, post.data.id)" class="border-[1px] rounded-md mb-2 p-2">
-
       <p>{{ post.data.id }}</p>
       <p>{{ post.data.title }}</p>
     </div>
-
-
-
       <button class="" @click="share(post)">Shere</button>
     </div>
   </div>
@@ -44,7 +39,7 @@ const share = async (post) => {
   if (navigator.share) {
     try {
       const dataShare = {
-        title: post.data.title ?? "",
+        title: post.data.title || "",
         text: "Check out this amazing content!",
         url: post.data.short_link || "",
       };

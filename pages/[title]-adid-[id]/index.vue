@@ -96,7 +96,7 @@ const share = async (post) => {
   if (navigator.share) {
     try {
       const dataShare = {
-        title: post.data.title ?? "",
+        title: post.data.title || "",
         text: "Check out this amazing content!",
         url: post.data.short_link || "",
       };
