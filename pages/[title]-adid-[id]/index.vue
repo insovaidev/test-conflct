@@ -1,7 +1,9 @@
 <template>
   <div>
     <p>details post</p>
-    <pre>{{ dataPostDetial }}</pre>
+    <img :src="dataPostDetial?.meta?.image ?? ''" alt="">
+    <pre>{{ dataPostDetial?.meta ?? ''}}</pre>
+
   </div>
 </template>
 
@@ -12,61 +14,59 @@ const dataPostDetial = ref('');
 const baseApiUrl = `https://test-post-share-api.onrender.com/`
 
 useHead({
-  title: dataPostDetial.value ? dataPostDetial.value.meta.title : '',
+  title: dataPostDetial.value?.meta?.title ?? '',
   meta: [
     {
       name: "keywords",
-      content: dataPostDetial.value ? dataPostDetial.value.meta.keyword : "",
+      content: dataPostDetial.value?.meta?.keyword ?? "",
     },
     {
       name: "description",
-      content: dataPostDetial.value ? dataPostDetial.value.meta.description : "",
+      content: dataPostDetial.value?.meta?.description ?? "",
     },
     {
       property: "og:title",
-      content: dataPostDetial.value ? dataPostDetial.value.meta.title : "",
+      content: dataPostDetial.value?.meta?.title ?? "",
     },
     {
       property: "fb:app_id",
-      content: dataPostDetial.value ? dataPostDetial.value.meta.fb.id : "",
+      content: dataPostDetial.value?.meta?.fb?.id ?? "",
     },
     {
       property: "og:type",
-      content: dataPostDetial.value ? dataPostDetial.value.meta.fb.type : "",
+      content: dataPostDetial.value?.meta?.fb?.type ?? "",
     },
     {
       property: "og:site_name",
-      content: dataPostDetial.value ? dataPostDetial.value.meta.site_name : "",
+      content: dataPostDetial.value?.meta?.site_name ?? "",
     },
     {
       property: "og:url",
-      content: dataPostDetial.value ? dataPostDetial.value.meta.url : "",
+      content: dataPostDetial.value?.meta?.url ?? "",
     },
     {
       property: "og:image",
-      content: dataPostDetial.value ? dataPostDetial.value.meta.image : "",
+      content: dataPostDetial.value?.meta?.image ?? "",
     },
     { property: "og:image:width", content: "600" },
     { property: "og:image:height", content: "600" },
     {
       property: "og:description",
-      content: dataPostDetial.value ? dataPostDetial.value.meta.description : "",
+      content: dataPostDetial.value?.meta?.description ?? "",
     },
     {
       property: "product:price:amount",
-      content:
-        dataPostDetial.value && dataPostDetial.value.meta.price
-          ? dataPostDetial.value.meta.price.toString()
-          : "",
+      content: dataPostDetial.value?.meta?.price?.toString() ?? "",
     },
     {
       property: "product:price:currency",
-      content: dataPostDetial.value ? dataPostDetial.value.meta.currency : "",
+      content: dataPostDetial.value?.meta?.currency ?? "",
     },
     { name: "twitter:card", content: "app" },
     { name: "twitter:site", content: "@nytimesbits" },
   ],
 });
+
 
 const id = route.params.id
 const title = route.params.title
