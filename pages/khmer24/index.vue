@@ -17,6 +17,7 @@
 const baseApiUrl = `https://api-posts.khmer24.com/`;
 const router = useRouter();
 const dataPosts = ref([]);
+const screenNavigateShare = ref(false) 
 
 const getPosts = async () => {
   try {
@@ -34,27 +35,58 @@ const toDetail = (title, id) => {
 };
 
 const share = async (post) => {
-  if (navigator.share) {
-    try {
-      const dataShare = {
-        title: post.data.title || "",
-        text: "Check out this amazing content!",
-        url: post.data.short_link || "",
-      };
-
-      console.log(dataShare)
-
-      await navigator.share({
-        ...dataShare,
-      });
-      console.log("Content shared successfully!");
-    } catch (error) {
-      console.error("Error sharing:", error);
+  await checkScreenUserAgent()
+  if (screenNavigateShare.value) {
+    if (navigator.share) {
+      try {
+        const dataShare = {
+          title: post.data.title || "",
+          text: "Check out this amazing content!",
+          url: post.data.short_link || "",
+        };
+  
+        console.log(dataShare)
+  
+        await navigator.share({
+          ...dataShare,
+        });
+        console.log("Content shared successfully!");
+      } catch (error) {
+        console.error("Error sharing:", error);
+      }
+    } else {
+      alert("Sharing not supported in your browser");
     }
+
   } else {
-    alert("Sharing not supported in your browser");
+    alert('Show desktop Modal!')
   }
 };
+
+
+async function checkScreenUserAgent() {
+  let check = false;
+  const toMatch = [
+    /Android/i,
+    /webOS/i,
+    /iPhone/i,
+    /iPad/i,
+    /iPod/i,
+    /BlackBerry/i,
+    /Windows Phone/i
+  ];
+
+  return toMatch.some((toMatchItem) => {
+    let march = navigator.userAgent.match(toMatchItem);
+    if (march) {
+      check = true;
+    }
+    screenNavigateShare.value = check;
+  });
+}
+
+
+
 
 onMounted(() => {
   getPosts();
