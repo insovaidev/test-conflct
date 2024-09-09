@@ -37,12 +37,12 @@ const toDetail = (title, id) => {
 };
 
 const share = async (post) => {
-
-  // await checkScreenUserAgent()
-
   let title = post.data.title || ""
   let text = post.data.title + " Check out this amazing content! "
   let url = post.data.short_link || ""
+
+  await checkScreenUserAgent()
+
 
   if (resultCheck) {
     if (navigator.canShare) {
