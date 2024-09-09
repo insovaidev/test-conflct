@@ -1,6 +1,6 @@
 <template>
   <div class="p-4">
-    <pre>{{  }}</pre>
+    <pre>{{ errorShare }}</pre>
     <div :key="post" v-for="post in dataPosts" class="list_post">
       <div
         @click="toDetail(post.data.title, post.data.id)"
