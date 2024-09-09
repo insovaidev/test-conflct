@@ -38,14 +38,14 @@ const toDetail = (title, id) => {
 
 const share = async (post) => {
 
-  await checkScreenUserAgent()
+  // await checkScreenUserAgent()
   
   if (resultCheck) {
     if (navigator.share) {
       try {
         const dataShare = {
           title: post.data.title || "",
-          text: "Cambodia on Khmer24.com",
+          text: " Check out this amazing content! ",
           url: post.data.short_link || "",
         };
     
@@ -86,6 +86,7 @@ async function checkScreenUserAgent() {
 
 
 onMounted(() => {
+  checkScreenUserAgent()
   getPosts();
   console.log("Console me");
 });
