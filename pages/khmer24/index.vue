@@ -14,7 +14,7 @@
   </div>
 </template>
  
-    <script setup>
+<script setup>
 const baseApiUrl = `https://api-posts.khmer24.com/`;
 const router = useRouter();
 const dataPosts = ref([]);
@@ -23,6 +23,7 @@ const screenNavigateShare = ref(false)
 let resultCheck = false
 const errorShare = ref()
 const supportedPorperties = ref('')
+
 
 const getPosts = async () => {
   try {
@@ -88,7 +89,10 @@ async function checkScreenUserAgent() {
 
 const share = (data) => {
 
-  let url = data.data.short_link.replace('https://www.khmer24.com', 'https://m.khmer24.com');
+  // console.log(window.location.origin)
+
+  let url = data.data.short_link.replace('https://www.khmer24.com', window.location.origin);
+  
   // Data to share
   const shareData = {
     title: data.data.title + " Cambodia on Khmer24.com ",
