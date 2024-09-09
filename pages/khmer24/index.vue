@@ -38,7 +38,7 @@ const toDetail = (title, id) => {
 
 const share = async (post) => {
   let title = post.data.title || ""
-  let text = post.data.title + " Cambodai on Khmer24.com! "
+  let text =  "Check out this amazing content!"
   let url = post.data.short_link || ""
 
   await checkScreenUserAgent()
