@@ -1,5 +1,6 @@
 <template>
   <div class="p-4">
+    <pre>{{  }}</pre>
     <div :key="post" v-for="post in dataPosts" class="list_post">
       <div
         @click="toDetail(post.data.title, post.data.id)"
@@ -20,7 +21,7 @@ const dataPosts = ref([]);
 const { isDesktop: isDesktopUseDevice, isMobile } = useDevice() 
 const screenNavigateShare = ref(false) 
 let resultCheck = false
-
+const errorShare = ref()
 const getPosts = async () => {
   try {
     const res = await $fetch(`${baseApiUrl}feed?fields=link&meta=true`);
@@ -52,7 +53,11 @@ const share = async (post) => {
           url: url
         });
         console.log("Content shared successfully!");
+      
       } catch (error) {
+        
+        errorShare.value = error
+
         alert("Error sharing:", error);
       }
     } else {
