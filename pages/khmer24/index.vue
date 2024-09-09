@@ -39,22 +39,22 @@ const toDetail = (title, id) => {
 const share = async (post) => {
 
   // await checkScreenUserAgent()
+  let dataShare = {
+    title: post.data.title || "",
+    text: post.data.title + " Check out this amazing content! ",
+    url: post.data.short_link || "",
+  };
   
   if (resultCheck) {
     if (navigator.share) {
       try {
-        const dataShare = {
-          title: post.data.title || "",
-          text: post.data.title + " Check out this amazing content! ",
-          url: post.data.short_link || "",
-        };
     
         await navigator.share({
           ...dataShare,
         });
         console.log("Content shared successfully!");
       } catch (error) {
-        console.error("Error sharing:", error);
+        alert("Error sharing:", error);
       }
     } else {
       alert("Sharing not supported in your browser");
