@@ -1,6 +1,6 @@
 <template>
   <div class="p-4">
-    <pre>{{ errorShare }}</pre>
+    <pre class="absolute">{{ supportedPorperties }}</pre>
     <div :key="post" v-for="post in dataPosts" class="list_post">
       <div
         @click="toDetail(post.data.title, post.data.id)"
@@ -22,6 +22,8 @@ const { isDesktop: isDesktopUseDevice, isMobile } = useDevice()
 const screenNavigateShare = ref(false) 
 let resultCheck = false
 const errorShare = ref()
+const supportedPorperties = ref('')
+
 const getPosts = async () => {
   try {
     const res = await $fetch(`${baseApiUrl}feed?fields=link&meta=true`);
@@ -88,9 +90,9 @@ const share = (data) => {
 
   // Data to share
   const shareData = {
-    title: data.title,
-    text: data.title,
-    url: data.short_link,
+    title: data.data.title,
+    text: data.data.title,
+    url: data.data.short_link,
   };
 
   // Check if the browser supports sharing some or all of these properties
@@ -110,7 +112,7 @@ const share = (data) => {
       supported.url = shareData.url
     }
 
-    alert('Supported properties:', supported);
+    supportedPorperties.value = supported
 
     // Share only if supported properties are present
     if (Object.keys(supported).length > 0) {
