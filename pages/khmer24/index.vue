@@ -46,7 +46,7 @@ const share = async (post) => {
   };
   
   if (resultCheck) {
-    if (navigator.share) {
+    if (navigator.canShare) {
       try {
     
         await navigator.share({
@@ -64,6 +64,8 @@ const share = async (post) => {
     alert('Show desktop Modal!')
   }
 };
+
+
 
 
 async function checkScreenUserAgent() {
