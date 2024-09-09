@@ -55,9 +55,6 @@ const share = async (post) => {
         console.log("Content shared successfully!");
       
       } catch (error) {
-        
-        errorShare.value = error
-
         alert("Error sharing:", error);
       }
     } else {
