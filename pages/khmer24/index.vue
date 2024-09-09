@@ -15,7 +15,7 @@
 </template>
  
     <script setup>
-const baseApiUrl = `https://test-posts.khmer24.com/`;
+const baseApiUrl = `https://api-posts.khmer24.com/`;
 const router = useRouter();
 const dataPosts = ref([]);
 const { isDesktop: isDesktopUseDevice, isMobile } = useDevice() 
@@ -117,6 +117,8 @@ const share = (data) => {
 
     // This is useful for debugging or displaying which properties are supported
     supportedPorperties.value = supported;
+
+    console.log(shareData)
 
     // Share only if at least one supported property is present
     if (Object.keys(supported).length > 0) {
