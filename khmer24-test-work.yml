@@ -1,0 +1,2354 @@
+
+<template>
+  <div :class="isMobile ? 'mt-5' : 'mt_80 min_h screen-content-desktop'">
+    <!-- App Bar -->
+    <div v-if="isMobile" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no_padding fix_app_bar">
+        <header :class="img_cover || (user_data && user_data.user && user_data.user.cover) ? 'bg_app_bar_header_' : 'bg_app_bar_header_ box_shadow_app_bar'">
+            <nav class="navbar navbar-light style_flex a_pad_app_bar nav_height">
+                <div class="text-center">
+                    <NuxtLink :to="localePath({ name: 'setting-edit-profile' })" aria-label="img" class="navbar-toggler mb-0 mt-1 ripple_change_language m-r-p-sm-pad">
+                        <img class="profile_user profile_user_width_small bg-white" :alt="user_data && user_data.user ? user_data.user.name : ''"
+                            :src='user_data && user_data.user && user_data.user.photo ? user_data.user.photo.small.url : empty_img_user'
+                            @error="imageUrlAlt_profile">
+                    </NuxtLink>
+                </div>
+                <div class="col p-0 truncate_wrap a_font_title_app_bar">
+                    <p class="m-0"> {{ user_data && user_data.user ? user_data.user.name : '' }} </p>
+                </div>
+                <div class="style_flex float-right ">
+                    <div @click="detectMob" class="btns ripple_icon_search">
+                        <button type="button" class="btn pt-1 pb-1" aria-label="share">
+                            <i class="icon-share1 font_22 text-white line_h_un"></i>
+                        </button>
+                    </div>
+                    <div class="btns ripple_icon_search">
+                        <NuxtLink :to="localePath({ name: 'setting' })" aria-label="setting" class="btn pb-1">
+                            <i class="fas fa-cog font_21 text-white line_h_un"></i>
+                        </NuxtLink>
+                    </div>
+                </div>
+            </nav>
+        </header>
+    </div>
+
+    <div class="max_width_form ">
+      <div :key="post" v-for="post in posts" class="list_post">
+      <div
+        class="border-[1px] rounded-md mb-2 p-2"
+      >
+        <p>{{ post.id }}</p>
+        <p>{{ post.title }}</p>
+      </div>
+      <button @click="share(post)">Shere</button>
+      </div>
+      <VueEternalLoading :load="get_active_post" v-model:is-initial="isInitial" :key="key_initial" v-if="key_initial > 1" margin="800px"></VueEternalLoading>
+    </div>
+
+
+    </div>
+
+</template>
+
+<script setup>
+import { VueEternalLoading } from '@ts-pro/vue-eternal-loading';
+import Modal_listing_categories from "/components/Pop_up_main_categories";
+import { VueCookieNext } from 'vue-cookie-next';
+import { event, pageview, query } from 'vue-gtag';
+import helper from "/helper";
+
+const isDesktop = helper.check_is_desktop(); // check userAgent
+// const isMobileDevice = helper.pc_or_mobile_device(); // check userAgent
+definePageMeta( { middleware: "auth" } ); // use layout dont have bottom nav bar check auth.
+const runtime_config = useRuntimeConfig();            // setup config env to config variable.
+const config = runtime_config.public;
+const route = useRoute();
+const router = useRouter();
+const version_library = config.LIBRARY_VERSION;
+const asset_url = '/'; // config.VUE_APP_BASE_URL;
+const empty_img_profile = ref("/icon/user-icon1.png");
+const empty_img_user = ref("/icon/user-icon.png");
+const empty_img_post = ref("/icon/empty_post.png");
+const ch_cl_re = useCookie('ch_cl_re')
+const ch_us = useCookie('ch_us')
+const check_cl_re = useState('check_cl_re',()=>'')
+
+
+// const cookie_lang = useCookie('lang'); // useCookie from nuxt3 document.
+// const language = ref(cookie_lang._rawValue ? cookie_lang._rawValue : 'en');
+const language = ref(helper.get_lang_cookie());
+const localePath = useLocalePath();
+const { locale } = useI18n();
+const user_data = ref('');
+const categories = ref('');
+
+const pageSize = ref(0)
+const posts = ref([])
+const expired_pageSize = ref(0);
+const expired_posts = ref([]);
+const counts = ref('');
+const loading = ref(false);
+const loading_field = ref(false);
+const post_id = ref(null);
+const delete_reason = ref('');
+const tap_active_or_expire = ref(route.query && route.query.check_tap ? route.query.check_tap : '');
+const delete_ad_expired = ref('');
+const show_error_message = ref('');
+const message_success = ref('');
+const error_or_success_message = ref(true);
+const selectedShow_MainCategory = ref(''); // declare for load component to template (Main Category)
+const profile_or_cover = ref('');
+// const show_loading_request_active = ref(false);
+const check_screen_device = ref(false); // ref(true = phone screen,  false = pc
+const check_screen_width = ref(false);  // check screen width for show image post big or small
+const the_route = route;
+const ref_cover = ref(null);
+const ref_profile = ref(null);
+
+const key_initial = ref(1);         // key for reload scroll again.
+const isInitial = ref(true); // value for reset scroll loader (true = reset scroll again).
+
+/*const total_applied_jobs = ref(0);*/
+const total_job_applications = ref(0);
+const post_job_unread = ref(0);
+const post_job_title = ref('');
+const full_path = ref('');          // full path of url page.
+
+const keyword = ref(route.query.keyword ? route.query.keyword : ''); // key word search
+const img_cover = ref('');  // for store recently change cover
+const img_pro = ref('');    // for store recently change profile
+
+const profile = ref('');
+const count_follow = ref('');
+const store = ref([]);
+
+const renew_hours = ref('01');
+const renew_minute = ref('00');
+const renew_am_or_pm = ref('am');
+const arr_hour = ref(['01','02','03','04','05','06','07','08','09','10','11','12']);
+const arr_minute = ref(['00','01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17',
+    '18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37',
+    '38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57',
+    '58','59']);
+
+// --- data change category by user ---
+const category_by_user = ref('');
+
+// --- desktop load more ---
+const ac_hide_btn_load_more = useState('ac_hide_btn_load_more', () => true);
+const dt_ac_loading = ref(false);
+const expi_hide_btn_load_more = useState('expi_hide_btn_load_more', () => true);
+const dt_expi_loading = ref(false);
+
+// --- delete post ---
+const delete_post = ref([]);
+const delete_check = ref('');
+const delete_description = ref('');
+const show_description = ref('');
+
+// --- condition check request (if 401 three time clear auth user) ---
+const reload_q_again_1 = ref(0); const reload_q_again_6 = ref(0); const reload_q_again_11 = ref(0);
+const reload_q_again_2 = ref(0); const reload_q_again_7 = ref(0); const reload_q_again_12 = ref(0);
+const reload_q_again_3 = ref(0); const reload_q_again_8 = ref(0); const reload_q_again_13 = ref(0);
+const reload_q_again_4 = ref(0); const reload_q_again_9 = ref(0);
+const reload_q_again_5 = ref(0); const reload_q_again_10 = ref(0);
+
+// --- state subscritiption ---
+const subPageSize = useState('subPageSize',() => 0);
+const mySubscription = useState('mySubscription', () => [])
+
+
+// --- meta variable ---
+const meta_title_acc = useState('meta_title_acc', () => 'Manage Ads - Khmer24.com');
+const GetAll = useState('GetAll',()=>'')
+const mobileDevice = ref(helper.m_or_d())
+const dataAdAction = ref(null)
+const shareButtonSipining = ref(false)
+const errorToast = ref('')
+const errorToastMessage = ref('')
+const successToast = ref('')
+const successToastMessage = ref('')
+const typeing = ref(false)
+const deleteReasons = ref('')
+const deleteForm = reactive({
+    id: '',
+    type: '',
+    reason: '',
+    description: ''
+})
+const dataShareModal = ref('')
+const shortLink = ref('')
+const availablePaidAds = ref([])
+const paidAdItem = ref('')
+const changeAd = ref('')
+
+const myAd = useState('myAd', () => [])
+let myAdOffset = 0
+const isInitialMyAd = ref(true);
+
+const filterMyAd = reactive({'category_type': '', 'category': ''})
+const changePaidAdFormData = reactive({'id': '', 'adid': null})
+const changeAdSelected = ref('')
+const errorData = reactive({'type': null, 'message': null, 'code': null, 'status': null})
+
+// Reset state
+const subscription = useState('subscription', () => [])
+const subscriptionOffset = useState('subscriptionOffset', () => 0);
+const subscriptionHistories = useState('subscriptionHistories', () => [])
+const subscriptionHistoriesOffset = useState('subscriptionHistoriesOffset', () => 0)
+subscriptionHistories.value = []
+subscriptionHistoriesOffset.value = 0
+subscription.value = []
+subscriptionOffset.value = 0
+const a_j_a_pageSize = useState('a_j_a_pageSize', () => 0);
+const a_j_a_job_applications = useState('a_j_a_job_applications', () => []);
+const isMobile= ref(helper.m_or_d())
+const attemptRequest = ref(0)
+let resultCheck = false
+
+useHead({
+  title: meta_title_acc.value,
+  meta: [
+    // -- ios --
+    // { name: 'apple-mobile-web-app-title', content: meta_title_acc.value },
+    // -- seo page --
+    { name: 'keywords', content: 'Buy, Sell' },
+    { name: 'description', content: 'Buy, Sell' },
+
+    { property: 'og:title', content: meta_title_acc.value },
+    { property: 'fb:app_id', content: '217361691621555' },
+    { property: 'og:site_name', content: 'www.khmer24.com' },
+    { property: 'og:url', content: 'https://www.khmer24.com/en/' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:image', content: 'https://www.khmer24.com/khmer24-crm-63/template/img/share-default-image.jpg' },
+    { property: 'og:image:width', content: '600' },
+    { property: 'og:image:height', content: '600' },
+    { property: 'og:description', content: 'Sell your 2nd hand items on Khmer24.com, the Cambodia #1 buy and sell website. Post free online classified ads of your used car, mobile phone, furniture, and more.' },
+  ]
+})
+
+      onMounted(()=>{
+        if (process.client) {  
+          checkScreenUserAgent()
+          a_j_a_pageSize.value = 0
+          a_j_a_job_applications.value = []
+          hidOverflow();
+          $('#changePremiumContent').addClass('d-none')
+          $('#myadsContent').removeClass('d-none')
+          const myModal = document.getElementById('myChangeAdsModal');
+          if (myModal) {
+            myModal.addEventListener('hidden.bs.modal', function () {
+              $('#actionModal').modal('hide')
+                $('#changePremiumContent').addClass('d-none')
+                $('#myadsContent').removeClass('d-none')
+                filterMyAd.category_type = ''
+                // changeAd.value = true
+                myAd.value = []
+                myAdOffset = 0
+                isInitialMyAd.value = true;
+            });
+          }
+
+          // Reset delete form when delete modal close
+          const deleteModal = document.getElementById('deleteAdModal');
+          if (deleteModal) {
+            deleteModal.addEventListener('hidden.bs.modal', function () {
+              resetDeleteForm()
+            })
+          }
+
+        successToast.value = $('#successToast')
+        errorToast.value = $('#errorToast')
+
+        // --- set state of subscription --- 
+        subPageSize.value = 0
+        mySubscription.value = []
+
+        check_auth_user();
+        categories.value = localStorage.getItem("categories") ? JSON.parse(localStorage.getItem("categories")) : [];
+        let auth = localStorage.getItem("auth_user") ? JSON.parse(localStorage.getItem("auth_user")) : [];
+        profile.value = auth ? auth.user : '';
+
+        // --- if bigger than 400 show big image, else show small image ---
+        if (screen.width >= 400) { check_screen_width.value = true; }
+        // --- this form not set condition in router.js ---
+        window.scrollTo(0, 0); // so set scroll to top auto if first reload
+        // --- add fullPath ---
+        full_path.value = route.fullPath;
+
+        // --- clear old pl-upload div ---
+        $('.a_edit_cover').children().remove("div");  $('.a_edit_profile').children().remove("div");
+
+        // --- ready function on upload ( change cover_profile and profile_user ) ---
+        setTimeout( function() {
+          ready_function_cover_image();
+          ready_function_image_profile();
+        }, 300); // create pl-upload.
+
+      // ---- remove class modal-open is user click back on button phone or click arrow browser ----
+      helper.remove_class_modal_open();
+
+      // ---- check screen of device user ----
+      check_screen_userAgent();
+
+      // ---- reset scroll loader again ----
+      setTimeout(function () {
+        isInitial.value = true;
+        key_initial.value += 1;
+      },300)
+
+      if (isDesktop && posts.value.length === 0) {
+          manually_get_active_post(); // In Desktop View and post empty for the first, must get new data.
+      }
+      if (isDesktop && expired_posts.value.length === 0) {
+          manually_get_expired_post(); // In Desktop View and post empty for the first, must get new data.
+      } 
+
+      get_all_total_count()
+
+      // --- Fancybox without hash (not push state history browser) ---
+      Fancybox.defaults.Hash = false;
+      get_profile()
+
+      const ch_resume = localStorage.getItem('isCheckedR');
+      const id_u = user_data.value.user.id
+      const ch_id = localStorage.getItem('ch_us'); 
+      if(!ch_resume){
+        localStorage.setItem('isCheckedR', true);
+        check_cl_re.value = true
+      }else if(ch_resume != true && id_u == ch_id){
+        localStorage.setItem('isCheckedR', false);
+        check_cl_re.value = false
+      }else{
+        localStorage.setItem('isCheckedR', true);
+        check_cl_re.value = true
+      }
+    }
+  })
+  
+  onBeforeUnmount(() => {
+    hideModals(['#actionModal','#mobileShareModal', '#deleteAdModal', '#mobileSocialMediaModal', '#myChangeAdsModal', '#changeAdErrorModal', '#failModal'])
+    Fancybox.close(); // prevent user click show image in fancyBbox then click back when fancyBox still show.
+  })
+
+  watch(() => route.query, () => {
+    let route_name = helper.clear_prefix_route_name(route.name);
+    if (route_name === 'account') {
+      if (route.fullPath !== full_path.value) { // if fullPath old is the same new, Not allow to do. (prevent click "fancybox" of image)
+        full_path.value = route.fullPath;
+        // console.log('--------- watch ---------');
+        // --- check tap change, change condition too ---
+        tap_active_or_expire.value = route.query && route.query.check_tap ? route.query.check_tap : '';
+        if (tap_active_or_expire.value === 'active') {
+          pageSize.value = 0;
+          posts.value = [];
+          if (isDesktop && posts.value.length === 0) { manually_get_active_post(); } // check is Screen Desktop.
+        } else {
+          expired_pageSize.value = 0;
+          expired_posts.value = [];
+          if (isDesktop && expired_posts.value.length === 0) { manually_get_expired_post(); } // check is Screen Desktop.
+        }
+
+        // console.log('===>>> watch');
+        get_all_total_count(); // get all count active and expired post when have search
+        isInitial.value = true;      // reset scroll loader again.
+        key_initial.value += 1;      // reset scroll loader again.
+      }
+    }
+  })
+
+  function hidOverflow(){
+      $('body').css('overflow','unset')
+  }
+
+  function resume(){
+    check_auth_user();
+    VueCookieNext.removeCookie('dl_resume')
+    localStorage.setItem('ch_us', user_data.value.user.id);
+    localStorage.setItem('isCheckedR', false);
+  }
+
+  function btn_create_post() {
+    router.push(localePath({name: 'post'}));
+  }
+
+  // ---- toast message ----
+  function toast_message(message, suc_or_error) {
+    message_success.value = message;
+    error_or_success_message.value = suc_or_error;
+    let toast = $('.acc_toast');
+    toast.removeClass('d-none');
+    toast.toast({ delay: 6000 });
+    toast.toast('show');
+  }
+
+  // ---- verify phone number ----
+  function show_verify_phone_number() {
+    router.push(localePath({ name: 'setting-change-phone', query: { from: 'account' } }));
+  }
+  // ---- check new auth user ----
+  function check_new_auth_user() {
+    user_data.value = process.server ? '' : (localStorage.getItem('auth_user') ? JSON.parse(localStorage.getItem('auth_user')) : '');
+  }
+
+  
+
+  // ---- show modal categories by user ----
+  function show_pop_up_category() {
+    $('#show_modal_categories').modal('show');
+
+    // setDefaultQuery()
+
+    // get categories by user has been post
+    category_by_user.value = { store_id: '' }; // ['1123', '1234q2'];
+  }
+
+  // ---- show followers or following ----
+  function show_follows(condition, enable_click) {
+    if (enable_click) {
+      save_track_optional('clear', { clear: 'clear_data' });
+      router.push(localePath({ name: 'username-follows', params: { username: profile.value.username }, query: { type: condition } }));
+    }
+  }
+
+  // ---- Profile ----
+  function get_profile() {
+    check_new_auth_user();
+    // -- count following and follower badge --
+    $fetch(config.VUE_APP_API_URL + 'me/follow_badges', {
+      headers: { "Access-Token": user_data.value.tokens.access_token },
+      params: { lang: language.value }
+    }).then(get_follow => {
+      count_follow.value = get_follow.data;
+    }).catch(error => {
+      if (error.response && error.response.status === 401) { // retry
+        if (reload_q_again_1.value <= 2) {
+          reload_q_again_1.value += 1;
+          check_auth_user();
+          setTimeout(() => { get_profile(); }, 3000);
+        }
+      }
+    });
+
+    // -- get user --
+    /*$fetch(config.VUE_APP_API_URL + 'profiles/'+user_data.value.user.username, {
+      headers: { "Access-Token": user_data.value.tokens.access_token },
+      params: { lang: language.value, fields: 'all', meta: true }
+    }).then(get_profile => {
+      profile.value = get_profile.data;
+    }).catch(error => {
+      if (error.response && error.response.status === 401) { // retry
+        if (reload_q_again_1.value <= 2) {
+          reload_q_again_1.value += 1;
+          check_auth_user();
+          setTimeout(() => { get_profile(); }, 3000);
+        } else {
+          localStorage.removeItem('auth_user');   // remove localStorage
+          VueCookieNext.removeCookie('auth_user');
+          router.replace(localePath({ name: 'index' }));
+        }
+      }
+    });*/
+
+    // -- get store --
+    $fetch(config.VUE_APP_API_URL + 'me/stores', {
+      headers: { "Access-Token": user_data.value.tokens.access_token },
+      params: { lang: language.value, fields: 'my_setting' }
+    }).then(get_store => {
+      store.value = get_store && get_store.data.length > 0 ? get_store.data : [];
+    }).catch(error => {
+      if (error.response && error.response.status === 401) { // retry
+        if (reload_q_again_11.value <= 2) {
+          reload_q_again_11.value += 1;
+          setTimeout(() => { get_profile(); }, 3000);
+        }
+      }
+    });
+    // -- get badge job applications --
+    $fetch(config.VUE_APP_API_URL_JOB + 'me/job_applications/total_unread', {
+    // $fetch(config.VUE_APP_API_URL + 'job_applications/total_unread', {
+      headers: { "Access-Token": user_data.value.tokens.access_token },
+      params: { lang: language.value },
+    }).then(res => {
+      total_job_applications.value = res.data ? parseInt(res.data.total) : 0;
+    }).catch(error => {
+      if (error.response && error.response.status === 401) { // retry
+        if (reload_q_again_13.value <= 2) {
+          reload_q_again_13.value += 1;
+          setTimeout(() => { get_profile(); }, 3000);
+        }
+      }
+    });
+  }
+
+  // ---- active post ----
+  async function get_active_post({loaded, error, noMore, noResults}, { isFirstLoad }) {
+    check_new_auth_user();
+
+    // $fetch(config.VUE_APP_API_URL + 'me/posts', {
+    $fetch(config.VUE_APP_API_URL + 'me/posts', {
+      // signal: AbortSignal.timeout(config.DELAY_REQUEST),
+      headers: { "Access-Token": user_data.value.tokens.access_token },
+      params: {
+        lang: language.value,
+        offset: pageSize.value,
+        fields: 'id,title,price,photo,thumbnail,views,renew_date,posted_date,last_update,link,auto_renew,is_premium,status,total_like,total_comment,total_job_application,category_type,availability,location',
+        functions: 'shipping,apply_job,insights',
+        // fields: 'id,title,price,photo,thumbnail,views,renew_date,posted_date,last_update,link,auto_renew,is_premium,status,phone,location,total_job_application,apply_job',
+        // type: 'active',
+        keyword: clean_keyword(keyword.value),
+        category: route.query.category ? route.query.category : '',
+      },
+
+    }).then(res => {
+      pageSize.value += res.limit; // add offset
+      if (res.data.length) {
+        posts.value = posts.value.concat(res.data); // concat in multiple array
+        const uniqueData = posts.value.filter((item, index, self) => // This just TMP solution forremove dubplicate item when switch tab.
+          index === self.findIndex((t) => t.id === item.id)
+        );
+        posts.value = uniqueData
+      }
+      if(res.available_paid_ads) {
+        availablePaidAds.value = res.available_paid_ads
+      }
+
+      set_ripple();
+
+      // -- tracking on google analytic --
+      if (posts.value.length <= 30 && pageSize.value === 60) {  } // prevent saved post smaller than 30 and request two time
+      else { track_google_analytics('active', pageSize.value > 30 ? pageSize.value-30 : 0); }
+
+      // -- check stop scroll or scroll more --
+      if (res.data.length === 0) {
+        if (posts.value.length === 0) {
+          if (isFirstLoad) {
+            noResults(); // console.log('noResult');
+          } else {
+            noMore(); // console.log('noMore');
+          }
+        } else {
+          noMore();
+        }
+      } else {
+        if (posts.value.length < pageSize.value) {
+          noMore(); // stop scroll.
+        } else {
+          loaded(); // scroll down get more.
+        }
+      }
+
+    }).catch(e => { // console.log(error.response);
+      if (!e.response) {
+        error();
+
+      } else {
+        if (e.response && e.response.status === 403) {
+          posts.value = [];
+          noResults();
+
+        } else if (e.response && e.response.status === 401) { // retry
+          if (reload_q_again_2.value <= 2) {
+            reload_q_again_2.value += 1;
+            check_auth_user();
+            setTimeout( () => { loaded(); }, 3000);
+          } else {
+            localStorage.removeItem('auth_user');   // remove localStorage
+            VueCookieNext.removeCookie('auth_user');
+            router.replace(localePath({name: 'index'}));
+          }
+        }
+      }
+    });
+  }
+  // ---- manually active post ----
+  function manually_get_active_post() {
+    check_new_auth_user();
+    dt_ac_loading.value = true;
+
+    $fetch(config.VUE_APP_API_URL + 'me/posts', {
+      // signal: AbortSignal.timeout(config.DELAY_REQUEST),
+      headers: { "Access-Token": user_data.value.tokens.access_token },
+      params: {
+        lang: language.value,
+        offset: pageSize.value,
+        fields: 'id,title,price,photo,thumbnail,views,renew_date,posted_date,last_update,link,auto_renew,is_premium,status,total_like,total_comment,total_job_application,category_type,availability,location',
+        functions: 'shipping,apply_job,insights',
+        // fields: 'id,title,price,photo,thumbnail,views,renew_date,posted_date,last_update,link,auto_renew,is_premium,status,phone,location,total_job_application,apply_job',
+        // type: 'active',
+        keyword: clean_keyword(keyword.value),
+        category: route.query.category ? route.query.category : '',
+      },
+
+    }).then(res => {
+      pageSize.value += res.limit; // add offset
+      if (res.data.length) {
+        posts.value = posts.value.concat(res.data); // concat in multiple array
+      }
+      if(res.available_paid_ads) {
+        availablePaidAds.value = res.available_paid_ads
+      }
+      dt_ac_loading.value = false;
+      ac_hide_btn_load_more.value = posts.value.length < pageSize.value ? false : true;
+      set_ripple();
+
+      // -- tracking on google analytic --
+      if (posts.value.length <= 30 && pageSize.value === 60) {  } // prevent saved post smaller than 30 and request two time
+      else { track_google_analytics('active', pageSize.value > 30 ? pageSize.value-30 : 0); }
+
+    }).catch(e => {
+      if (!e.response) {  } else {
+        if (e.response && e.response.status === 403) {
+          posts.value = [];
+        } else if (e.response && e.response.status === 401) { // retry
+          if (reload_q_again_2.value <= 2) {
+            reload_q_again_2.value += 1;
+            check_auth_user();
+            setTimeout( () => { manually_get_active_post(); }, 3000);
+          } else {
+            localStorage.removeItem('auth_user');   // remove localStorage
+            VueCookieNext.removeCookie('auth_user');
+            router.replace(localePath({name: 'index'}));
+          }
+        }
+      }
+      dt_ac_loading.value = false;
+    });
+  }
+
+  // ---- expired post ----
+  async function get_expired_post({loaded, error, noMore, noResults}, { isFirstLoad }) {
+    check_new_auth_user();
+    $fetch(config.VUE_APP_API_URL + 'me/posts', {
+      // signal: AbortSignal.timeout(config.DELAY_REQUEST),
+      headers: { "Access-Token": user_data.value.tokens.access_token },
+      params: {
+        lang: language.value,
+        offset: expired_pageSize.value,
+        fields: 'id,title,price,photo,thumbnail,views,renew_date,posted_date,last_update,link,auto_renew,is_premium,status',
+        type: 'expired',
+        keyword: clean_keyword(keyword.value),
+        category: route.query.category ? route.query.category : '',
+      },
+
+    }).then(res => {
+      expired_pageSize.value += res.limit; // add offset
+      if (res.data.length) {
+        expired_posts.value = expired_posts.value.concat(res.data); // concat in multiple array
+
+        const uniqueData = expired_posts.value.filter((item, index, self) => // This just TMP solution for remove dubplicate item when switch tab.
+          index === self.findIndex((t) => t.id === item.id)
+        );
+        expired_posts.value = uniqueData
+
+      }
+      set_ripple();
+
+      // -- tracking on google analytic --
+      if (expired_posts.value.length <= 30 && expired_pageSize.value === 60) {  } // prevent saved post smaller than 30 and request two time
+      else { track_google_analytics('expired', expired_pageSize.value > 30 ? expired_pageSize.value-30 : 0); }
+
+      // -- check stop scroll or scroll more --
+      if (res.data.length === 0) {
+        if (isFirstLoad) {
+          noResults(); // console.log('noResult');
+        } else {
+          noMore(); // console.log('noMore');
+        }
+      } else {
+        if (expired_posts.value.length < expired_pageSize.value) {
+          noMore(); // stop scroll.
+        } else {
+          loaded(); // scroll down get more.
+        }
+      }
+
+    }).catch(e => { // console.log(error.response);
+      if (!e.response) {
+        error();
+      } else {
+        if (e.response && e.response.status === 403) {
+          expired_posts.value = [];
+          noResults();
+
+        } else if (e.response && e.response.status === 401) { // retry
+          if (reload_q_again_3.value <= 2) {
+            reload_q_again_3.value += 1;
+            check_auth_user();
+            setTimeout( () => { loaded(); }, 3000);
+          } else {
+            localStorage.removeItem('auth_user');
+            VueCookieNext.removeCookie('auth_user');
+            router.replace(localePath({ name: 'index' }));
+          }
+        }
+      }
+    });
+  }
+  // ---- manually expired post ----
+  function manually_get_expired_post () {
+    check_new_auth_user();
+    dt_expi_loading.value = true;
+
+    $fetch(config.VUE_APP_API_URL + 'me/posts', {
+      // signal: AbortSignal.timeout(config.DELAY_REQUEST),
+      headers: { "Access-Token": user_data.value.tokens.access_token },
+      params: {
+        lang: language.value,
+        offset: expired_pageSize.value,
+        fields: 'id,title,price,photo,thumbnail,views,renew_date,posted_date,last_update,link,auto_renew,is_premium,status',
+        type: 'expired',
+        keyword: clean_keyword(keyword.value),
+        category: route.query.category ? route.query.category : '',
+      },
+
+    }).then(res => {
+      expired_pageSize.value += res.limit; // add offset
+      if (res.data.length) {
+        expired_posts.value = expired_posts.value.concat(res.data); // concat in multiple array
+      }
+
+      dt_expi_loading.value = false;
+      expi_hide_btn_load_more.value = expired_posts.value.length < expired_pageSize.value ? false : true;
+      set_ripple();
+
+      // -- tracking on google analytic --
+      if (expired_posts.value.length <= 30 && expired_pageSize.value === 60) {  } // prevent saved post smaller than 30 and request two time
+      else { track_google_analytics('expired', expired_pageSize.value > 30 ? expired_pageSize.value-30 : 0); }
+
+    }).catch(e => {
+      if (!e.response) {  } else {
+        if (e.response && e.response.status === 403) {
+          expired_posts.value = [];
+        } else if (e.response && e.response.status === 401) { // retry
+          if (reload_q_again_3.value <= 2) {
+            reload_q_again_3.value += 1;
+            check_auth_user();
+            setTimeout( () => { manually_get_expired_post(); }, 3000);
+          } else {
+            localStorage.removeItem('auth_user');
+            VueCookieNext.removeCookie('auth_user');
+            router.replace(localePath({ name: 'index' }));
+          }
+        }
+      }
+      dt_expi_loading.value = false;
+    });
+  }
+
+  // ---- count all total ----
+  async function get_all_total_count() {
+    check_new_auth_user();
+
+    await $fetch(config.VUE_APP_API_URL + 'me/posts/total', {
+      // signal: AbortSignal.timeout(config.DELAY_REQUEST),
+      headers: { "Access-Token": user_data.value.tokens.access_token },
+      params: {
+        lang: language.value,
+        keyword: clean_keyword(keyword.value),
+        category: route.query.category ? route.query.category : '',
+      },
+
+    }).then(get_counts => {
+      counts.value = get_counts.data;
+
+    }).catch(error => { // console.log(error.response);
+      if (error.response) {
+        let check = error.response;
+        let data_check = JSON.stringify(check);
+        let data_parse = JSON.parse(data_check);
+
+        if (check.status === 403) {
+          toast_message(data_parse._data.message, false);
+
+        } else if (check.status === 401) { // retry
+          if (reload_q_again_4.value <= 2) {
+            reload_q_again_4.value += 1;
+            check_auth_user();
+            setTimeout( () => { get_all_total_count(); }, 3000);
+          } else {
+            localStorage.removeItem('auth_user');
+            VueCookieNext.removeCookie('auth_user');
+            router.replace(localePath({ name: 'index' }));
+          }
+
+        } else {
+          toast_message(data_parse._data.message, false);
+        }
+      }
+    });
+  }
+  // ---- click search ----
+  function click_search(clear_category) {
+    let query_str = '';
+    if (clear_category === 'clear_keyword') {
+      query_str = {
+        check_tap: route.query.check_tap === 'expired' ? 'expired' : 'active',
+        category_name: route.query.category_name ? route.query.category_name : '',
+        category: route.query.category ? route.query.category : '',
+        keyword: '',
+      }
+      keyword.value = ''; // clear keyword
+    } else if (clear_category === 'clear_category') {
+      query_str = {
+        check_tap: route.query.check_tap === 'expired' ? 'expired' : 'active',
+        category_name: '',
+        category: '',
+        keyword: clean_keyword(keyword.value),
+      }
+    } else if (clear_category === 'tab_active') {
+      query_str = {
+        check_tap: 'active',
+        category_name: route.query.category_name ? route.query.category_name : '',
+        category: route.query.category ? route.query.category : '',
+        keyword: clean_keyword(keyword.value),
+      }
+    } else if (clear_category === 'tab_expired') {
+      query_str = {
+        check_tap: 'expired',
+        category_name: route.query.category_name ? route.query.category_name : '',
+        category: route.query.category ? route.query.category : '',
+        keyword: clean_keyword(keyword.value),
+      }
+    } else {
+      query_str = {
+        check_tap: route.query.check_tap === 'expired' ? 'expired' : 'active',
+        category_name: route.query.category_name ? route.query.category_name : '',
+        category: route.query.category ? route.query.category : '',
+        keyword: clean_keyword(keyword.value),
+      }
+    }
+
+    // push route change
+    router.replace(localePath({ name: 'account', query: query_str }));
+  }
+
+  // ---- click show detail ----
+  function click_show_block(status_message) { toast_message(status_message, false); }
+
+  // ---- set ripple ----
+  function set_ripple() {
+    // setTimeout(function () { $(".ripple_icon_search, .ripple_change_language, #pills-ads, #pills-like,.cl_ripple").ripple(); }, 300);
+  }
+
+  // ---- convert date ----
+  function convertFromNow(date, condition) {
+    if ( condition === 'ago' ) {
+      return helper.check_date_ago(date, '');          // display format date
+    } else {
+      return helper.check_date_ago(date, 'check_current_year');
+    }
+  }
+
+  // ---- show list jobs_unread by job_post ----
+  function show_jobs_unread() {  // value push query get from function "show_modal_option".
+    save_track_optional('clear_old_data', { clear_old_data: 'clear' });
+    router.push(localePath({ name: 'account-job-applications', query: { post_id: post_id.value, title: post_job_title.value } }));
+  }
+
+  // ---- set auto renew ----
+  function show_modal_option(data,id, job_unread, title) {
+    dataAdAction.value = data
+    $("#actionModal").modal('show')
+    post_job_unread.value = job_unread;    
+    post_job_title.value = title;
+    post_id.value = id;     
+  }
+
+  function set_auto_renew() {
+    $('#modal_set_auto_renew').modal('hide');
+    $('#modal_choose_time_picker').modal('show');
+
+    // --- add class modal-open to body ---
+    helper.add_class_modal_open();
+  }
+
+  function click_save_auto_renew() {
+    if(window.navigator.onLine) {
+      check_new_auth_user();
+
+      let data_body = {
+        hour: renew_hours.value,
+        minute: renew_minute.value,
+        ampm: renew_am_or_pm.value,
+      }
+      if (post_id.value && renew_hours.value && renew_minute.value && renew_am_or_pm.value) {
+        loading_field.value = true;
+        $fetch(config.VUE_APP_API_URL + 'me/posts/' + post_id.value + '/set_auto_renew',{
+          // signal: AbortSignal.timeout(config.DELAY_REQUEST),
+          headers: {"Access-Token": user_data.value.tokens.access_token},
+          method: 'POST',
+          params: {lang: language.value},
+          body: new URLSearchParams(data_body)
+
+        }).then(res_auto_renew => {
+          let short = res_auto_renew.data;
+          $('#modal_choose_time_picker').modal('hide');
+
+          let id_post = post_id.value;
+          for (var p = 0; p < posts.value.length; p++) {
+            if (parseInt(posts.value[p].id) === parseInt(id_post)) {
+              if (posts.value[p].auto_renew) {
+                posts.value[p].auto_renew = short;
+              } else {
+                posts.value[p]['auto_renew'] = short;
+              }
+            }
+          }
+
+        }).catch(error => {
+          if (!error.response) {
+            if (reload_q_again_5.value < 2) {
+              reload_q_again_5.value += 1;
+              check_auth_user();
+              setTimeout( () => { click_save_auto_renew(); }, 3000);
+            } else {
+              $('#modal_choose_time_picker').modal('hide');
+              $('#modal_show_status_error_connection').modal('show');
+            }
+          } else {
+            if (error.response) {
+              let check = error.response; // original data error
+              let data_check = JSON.stringify(check);
+              let data_parse = JSON.parse(data_check);
+
+              if (check.status === 403) {
+                // show_error_message.value = data_parse._data.message;
+                $('#modal_choose_time_picker').modal('hide');
+                // $('#modal_show_error').modal('show');
+                errorData.type = 'auto_renew_fail'
+                errorData.message = error.response._data.message
+                $('#failModal').modal('show')
+
+              } else if (check.status === 401) { // retry
+                if (reload_q_again_5.value <= 2) {
+                  reload_q_again_5.value += 1;
+                  check_auth_user();
+                  setTimeout( () => { click_save_auto_renew(); }, 3000);
+                } else {
+                  localStorage.removeItem('auth_user');   // remove localStorage
+                  VueCookieNext.removeCookie('auth_user');
+                  router.replace(localePath({ name: 'index' }));
+                }
+
+              } else {
+                toast_message(data_parse._data.message, false);
+              }
+            }
+          }
+
+        }).finally(() => (loading_field.value = false));
+      }
+
+    } else {
+      $('#modal_choose_time_picker').modal('hide');
+      $('#modal_show_status_error_connection').modal('show');
+    }
+  }
+
+  // --- remove auto renew ---
+  function remove_auto_renew(id) {
+    post_id.value = id;
+    $('#modal_confirm_remove_auto_renew').modal('show');
+  }
+
+  function click_remove_auto_renew() {
+    check_new_auth_user();
+    loading_field.value = true;
+    $fetch(config.VUE_APP_API_URL + 'me/posts/' + post_id.value + '/remove_auto_renew',{
+      // signal: AbortSignal.timeout(config.DELAY_REQUEST),
+      headers: {"Access-Token": user_data.value.tokens.access_token},
+      method: 'POST',
+      params: {lang: language.value}
+    }).then(res => {
+      stop_loop:
+              for (var p = 0; p < posts.value.length; p++) {
+                if (parseInt(posts.value[p].id) === parseInt(post_id.value)) {
+                  posts.value[p].auto_renew = '';
+                  break stop_loop; // break the loop
+                }
+              }
+
+      $('#modal_confirm_remove_auto_renew').modal('hide');
+      helper.remove_class_modal_open();
+
+    }).catch(error => {
+      if (!error.response) {
+        if (reload_q_again_6.value <= 2) {
+          reload_q_again_6.value += 1;
+          check_auth_user();
+          setTimeout( () => { click_remove_auto_renew(); }, 3000);
+        } else {
+          $('#modal_confirm_remove_auto_renew').modal('hide');
+          $('#modal_show_status_error_connection').modal('show');
+        }
+
+      } else if (error.response) {
+        let check = error.response; // original data error
+        let data_check = JSON.stringify(check);
+        let data_parse = JSON.parse(data_check);
+
+        if (check.status === 401) { // retry
+          if (reload_q_again_6.value <= 2) {
+            reload_q_again_6.value += 1;
+            check_auth_user();
+            setTimeout(() => { click_remove_auto_renew(); }, 3000);
+          } else {
+            localStorage.removeItem('auth_user');   // remove localStorage
+            VueCookieNext.removeCookie('auth_user');
+            router.replace(localePath({name: 'index'}));
+          }
+
+        } else {
+          toast_message(data_parse._data.message, false);
+        }
+      }
+    }).finally(() => (loading_field.value = false));
+  }
+
+  function edit_auto_renew(id, hour, minute, am_or_pm) {
+    post_id.value = id;
+    renew_hours.value = hour;
+    renew_minute.value = minute;
+    renew_am_or_pm.value = am_or_pm;
+
+    $('#modal_choose_time_picker').modal('show');
+  }
+
+  // ---- renew button ----
+  function renew_button(id) {
+    check_new_auth_user();
+    loading_field.value = true;
+    $fetch(config.VUE_APP_API_URL + 'me/posts/'+id+'/renew',{
+      // signal: AbortSignal.timeout(config.DELAY_REQUEST),
+      headers: { "Access-Token": user_data.value.tokens.access_token },
+      method: 'POST',
+      params: {lang: language.value}
+    }).then(res_renew => {
+      stop_loop_if_condition_true:
+        for (var p = 0; p < posts.value.length; p++) {
+          if (parseInt(posts.value[p].id) === parseInt(id)) {
+            posts.value[p].renew_date = res_renew.data.date;
+            break stop_loop_if_condition_true;
+          }
+        }
+
+      toast_message('', true);
+
+    }).catch(error => {
+      if (!error.response) {
+        if (reload_q_again_7.value < 2) {
+          reload_q_again_7.value += 1;
+          check_auth_user();
+          setTimeout( () => { renew_button(id); }, 3000);
+        } else {
+          $('#modal_show_status_error_connection').modal('show');
+        }
+
+      } else if (error.response) {
+        let check = error.response ? error.response : '';  // original data error
+        let data_check = JSON.stringify(check);
+        let data_parse = JSON.parse(data_check);
+
+        if (check.status === 403) {
+          toast_message(data_parse._data.message, false);
+
+        } else if (check.status === 401) { // retry
+          if (reload_q_again_7.value <= 2) {
+            reload_q_again_7.value += 1;
+            check_auth_user();
+            setTimeout( () => { renew_button(id); }, 3000);
+          } else {
+            localStorage.removeItem('auth_user');   // remove localStorage
+            VueCookieNext.removeCookie('auth_user');
+            router.replace(localePath({ name: 'index' }));
+          }
+
+        } else {
+          toast_message(data_parse._data.message, false);
+        }
+      }
+    }).finally(() => (loading_field.value = false));
+  }
+
+  function renew_btn_disable(renew_date) {  // ---- check disable renew btn ----
+    let renewDate = check_renew_date(renew_date);   // date and month renew date
+    let today = check_renew_date('');          // date and month current date
+    if (today == renewDate) { // if current date and renew date equal disable button
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  function check_renew_date(date) {
+    var now = date ? new Date(date) : new Date();
+    let day = now.getDate();
+    let month = now.getMonth()+1;
+    if (parseInt(day) < 10) day = '0'+day;
+    if (parseInt(month) < 10) month = '0'+month;
+    return month+day;
+  }
+
+  // ---- track on google analytic ----
+  function track_google_analytics (con, per_page) {
+    // setTimeout(() => {
+      let offset = per_page > 0 ? '?offset=' + per_page : ''; // set offset of page if scroll get more data
+      let page_path = route.path + offset;           // ex: '/en/mobiles/airpods-pro-25-adid-4688774.html'
+      let page_location = window.location.href + offset;   // ex: 'https://www.khmer24.com/en/mobiles/airpods-pro-25-adid-4688774.html'
+      let data = {
+        page_title: meta_title_acc.value,
+        page_location: page_location,
+        page_path: page_path,
+      };
+      // -- event on page --
+      event(con === 'expired' ? 'ads_expired' : 'ads_active', data);
+      // -- page_view --
+      pageview(data);
+    // },50);
+  }
+
+  // ---- show modal change or view profile ----
+  function show_or_change_pro(pro_or_cover) {
+    // check Cover is empty
+    if (pro_or_cover === 'cover') {
+      if (profile.value && !profile.value.cover) {
+        $('.a_edit_cover div input[type=file]').click();    // click direct file cover
+      } else {
+        $('#modal_change_image').modal('show');
+        profile_or_cover.value = pro_or_cover;
+      }
+    // check Profile is empty
+    } else {
+      if (profile.value && !profile.value.photo) {
+        $('.a_edit_profile div input[type=file]').click();      // click direct file profile
+      } else {
+        $('#modal_change_image').modal('show');
+        profile_or_cover.value = pro_or_cover;
+      }
+    }
+  }
+  // ---- click cover change cover when cover empty ----
+  function change_cover_empty() { $('.a_edit_cover div input[type=file]').click(); }
+  // ---- function view or change ----
+  function view_or_change(view_or_change) {
+    $('#modal_change_image').modal('hide');         // close modal
+    if (view_or_change === 'view') {                // click view profile or cover
+      if (profile_or_cover.value === 'profile') {   // click view profile picture
+        ref_profile.value.click();                  // view profile
+      } else {
+        ref_cover.value.click();                    // view cover
+      }
+    } else {                                        // click change profile or cover
+      if (profile_or_cover.value === 'profile') {
+        $('.a_edit_profile div input[type=file]').click();  // click direct file profile
+      } else {
+        $('.a_edit_cover div input[type=file]').click();    // click direct file cover
+      }
+    }
+  }
+
+  // ---- show modal delete reason ----
+  function show_modal_delete(id, ad_block, ad_expired) {
+    check_new_auth_user();
+    if(window.navigator.onLine) {
+      delete_check.value = '';         // clear check
+      delete_description.value = '';   // clear description
+      show_description.value = '';     // hide description
+      $('#delete_description').removeClass('error_field_text_report'); // clear error on description
+      $('#error_delete_description').addClass('d-none');            // remove text show error
+
+      delete_ad_expired.value = ad_expired ? ad_expired : ''; // this line check if delete post expired
+      post_id.value = id;
+      if (!localStorage.getItem("delete_post")) {
+        loading_field.value = true;
+        check_auth_user(); // get new auth_user
+
+        $fetch(config.VUE_APP_API_URL + 'me/posts/delete_reasons', {
+          // signal: AbortSignal.timeout(config.DELAY_REQUEST),
+          headers: {"Access-Token": user_data.value.tokens.access_token},
+          params: {lang: language.value},
+        }).then(response => {
+          const object = {
+            data: response.data,
+            expiry: helper.Date_To_Timestamp('', 86400, 'seconds'),  // add 1 day
+          }
+          localStorage.setItem("delete_post", JSON.stringify(object));
+          delete_post.value = localStorage.getItem("delete_post") ? JSON.parse(localStorage.getItem("delete_post")) : [];
+          $('#modal_show_delete_reason').modal('show');
+
+        }).catch(error => {
+          if (!error.response) {
+            if (reload_q_again_8.value < 2) {
+              reload_q_again_8.value += 1;
+              check_auth_user();
+              setTimeout( () => { show_modal_delete(id, ad_block, ad_expired); }, 3000);
+            } else {
+              $('#modal_show_delete_reason').modal('hide');
+              $('#modal_show_status_error_connection').modal('show');
+            }
+
+          } else if (error.response && error.response.status === 401) { // retry
+            if (reload_q_again_8.value <= 2) {
+              reload_q_again_8.value += 1;
+              check_auth_user();
+              setTimeout( () => { show_modal_delete(id, ad_block, ad_expired); }, 3000);
+            } else {
+              localStorage.removeItem('auth_user');   // remove localStorage
+              VueCookieNext.removeCookie('auth_user');
+              router.replace(localePath({name: 'index'}));
+            }
+          }
+        }).finally(() => (loading_field.value = false));
+      } else {
+        delete_post.value = localStorage.getItem("delete_post") ? JSON.parse(localStorage.getItem("delete_post")) : [];
+        $('#modal_show_delete_reason').modal('show');
+      }
+
+    } else {
+      $('#modal_show_delete_reason').modal('hide');
+      $('#modal_show_status_error_connection').modal('show');
+    }
+  }
+  function choose_delete(reason) {
+    if (reason === 'other') {
+      show_description.value = 'show_description'; // show description
+      $('#delete_description').focus(); // focus description
+      delete_description.value = '';   // clear
+    } else {
+      show_description.value = '';     // hide description
+      delete_description.value = '';   // clear
+    }
+    // -- remove error on description field --
+    $('#delete_description').removeClass('error_field_text_report');
+    $('#error_delete_description').addClass('d-none');
+
+    delete_check.value = reason;
+  }
+  function close_delete_modal() { $('#modal_show_delete_reason').modal('hide'); }
+  function click_delete_ads() {
+    check_new_auth_user();
+    let data_body = {
+      reason: delete_check.value,
+      type:  delete_ad_expired.value ? 'expired' : 'active',
+      description: delete_description.value ? delete_description.value : '',
+    }
+    // --- check store id is delete store post ---
+    // if (detail.value && detail.value.store && detail.value.store.id) { data_body['storeid'] = detail.value.store.id; }
+    // --- check is select or select other with write description condition ---
+    if ((!delete_check.value) || (delete_check.value === 'other' && !delete_description.value)) {
+
+      // -- show error on textarea --
+      $('#delete_description').addClass('error_field_text_report');
+      $('#error_delete_description').removeClass('d-none');
+
+      let message = '';
+      if (!delete_check.value) {
+        message = language.value === 'km' ? 'សូមជ្រើសរើសហេតុផលនៃកាលុប' : 'Please Choose Delete Reason';
+      } else {
+        message = language.value === 'km' ? 'បំពេញមូលហេតុនៃកាលុប' : 'Write Delete Reason';
+        $('#delete_description').focus();
+      }
+      toast_message(message, false);
+    } else {
+      loading_field.value = true;
+      $fetch(config.VUE_APP_API_URL + 'me/posts/' + post_id.value,{
+        // signal: AbortSignal.timeout(config.DELAY_REQUEST),
+        headers: { "Access-Token": user_data.value.tokens.access_token },
+        method: 'DELETE',
+        params: {lang: language.value},
+        body: new URLSearchParams(data_body)
+      }).then(res => {
+        $('#item_' + post_id.value).remove();
+        $('#modal_show_delete_reason').modal('hide');
+        $('#modal_show_delete_ads_block').modal('hide');
+        delete_reason.value = '';                    // clear delete reason
+        helper.remove_class_modal_open();
+
+        toast_message(res.message, true);  // show message success
+
+        // --- check minus 1 when delete from expired list or active list ---
+        if (route.query.check_tap && route.query.check_tap === 'expired') {
+          counts.value.expired = parseInt(counts.value.expired) - 1;
+        } else {
+          counts.value.active = parseInt(counts.value.active) - 1;
+        }
+        counts.value.total = parseInt(counts.value.total) - 1;
+        // --- /check minus 1 when delete from expired list or active list ---
+
+      }).catch(error => {
+        if (!error.response) {
+          if (reload_q_again_9.value < 2) {
+            reload_q_again_9.value += 1;
+            check_auth_user();
+            setTimeout( () => { click_delete_ads(); }, 3000);
+          } else {
+            $('#modal_show_delete_reason').modal('hide');
+            $('#modal_show_status_error_connection').modal('show');
+          }
+        } else if (error.response) {
+          let check = error.response; // original data error
+          let data_check = JSON.stringify(check);
+          let data_parse = JSON.parse(data_check);
+
+          if (check.status === 403) {
+            $('#modal_show_delete_ads_block').modal('hide');
+            toast_message(data_parse._data.message, false);
+
+          } else if (check.status === 401) { // retry
+            if (reload_q_again_9.value <= 2) {
+              reload_q_again_9.value += 1;
+              check_auth_user();
+              setTimeout( () => { click_delete_ads(); }, 3000);
+            } else {
+              localStorage.removeItem('auth_user');   // remove localStorage
+              VueCookieNext.removeCookie('auth_user');
+              router.replace(localePath({name: 'index'}));
+            }
+
+          } else {
+            toast_message(data_parse._data.message, false);
+          }
+        }
+      }).finally(() => (loading_field.value = false));
+    }
+
+    $('#modal_show_delete_reason').modal('hide')
+  }
+
+  // ---- convert price ----
+  function convert_price(price) { return helper.convert_price(price); }
+
+  // ---- alert notification ----
+  function show_notification(title, id, block) {
+    if (block) {
+      showErrorToast(block);
+    } else {
+      show_detail(title, id);
+    }
+  }
+
+  // ---- show detail post ----
+  function show_detail(title, id) {
+    router.push(localePath({ name: 'title-adid-id', params: { title: helper.check_special_char(title), id: id } }));
+    save_track_optional('clear_old_data', { clear_old_data: id });
+  }
+
+  // ---- must to get all category before user click edit post ----
+  function loadCategories() {
+    check_new_auth_user();
+    if (!categories.value || (categories.value && !categories.value.data) || (categories.value && !categories.value.url) || (categories.value && categories.value.url && categories.value.url !== config.VUE_APP_API_URL)) {
+      $fetch(config.VUE_APP_API_URL + 'categories', {
+        // signal: AbortSignal.timeout(config.DELAY_REQUEST),
+        params: { meta: true, v: 1 },
+      }).then(response => {
+        const object = {
+          data: response.data,
+          meta: response.meta,
+          expiry: helper.Date_To_Timestamp('', 7200, 'seconds'),  // add 1 day
+          url: config.VUE_APP_API_URL, // for check to get new categories up to date.
+        }
+        localStorage.setItem("categories", JSON.stringify(object));
+        categories.value = localStorage.getItem("categories") ? JSON.parse(localStorage.getItem("categories")) : [];
+
+      }).catch(error => {
+        if (!error.response) {
+          if (reload_q_again_10.value < 2) {
+            reload_q_again_10.value += 1;
+            check_auth_user();
+            setTimeout( () => { loadCategories(); }, 3000);
+          }
+        } else if (error.response) {
+          if (error.response.status === 401) {
+            if (reload_q_again_10.value <= 2) {
+              reload_q_again_10.value += 1;
+              check_auth_user();
+              setTimeout( () => { loadCategories(); }, 3000);
+            }
+          } else {
+            localStorage.removeItem('auth_user');
+            VueCookieNext.removeCookie('auth_user');
+            router.replace(localePath({name: 'index'}));
+          }
+        }
+      });
+    }
+  }
+
+  // ---- clean special char to use in url ----
+  function clean_keyword(search_text) { return helper.check_special_search_text(search_text); }
+  // ---- click enter and search ----
+  function keymonitor(e) {
+    if (e.keyCode === 13) {
+      $('#search_field').blur(); // remove focus in jquery
+      click_search('');
+    }
+  }
+
+  // ---- ready function on upload ( change cover_profile and profile_user ) ----
+  function ready_function_cover_image() {
+    // console.log('ready function');
+    var au_user = user_data.value;
+    // var counter = 1;
+    // var image = [];
+    // var limit = 8;
+    var max_size = 24;
+    // var maxRes = 1000000;
+    var multi_uploader = new plupload.Uploader({
+      runtimes : 'html5,flash,silverlight,html4',
+      browse_button: ["cover_profile"], // ["cover_profile","cover_profile1"], // "cover_profile","cover_profile1"
+      url: config.VUE_APP_API_URL+'me/upload_cover',  // 'http://khmer24.snadai.io/v1.0/me/upload_cover',
+
+  max_file_size : max_size+'mb',
+  unique_names : true,
+  multi_selection: false, // upload multiple or single ( choose single = false; choose multiple = true )
+  chunk_size: '1mb',
+  resize : { width : 1500, height : 1400, quality : 100, crop: false }, // preserve_headers: false
+  filters : {
+    mime_types : [
+      { title : "Image files", extensions : "jpg,gif,png,jpeg" }
+    ],
+    check_image_size: 100
+  },
+  // drop_element : 'multi-upload',
+  flash_swf_url : 'plupload-2.3.9/Moxie.swf',
+  silverlight_xap_url : 'plupload-2.3.9/Moxie.xap',
+  headers: { "Access-Token": user_data.value.tokens.access_token },
+});
+
+    multi_uploader.init();
+
+    multi_uploader.bind('FilesAdded', function(up, files) {
+      multi_uploader.start();
+    });
+
+    multi_uploader.bind('BeforeUpload', (up, file) => {
+      // -- prevent when refresh token and uploader not get the token, so add access-token every upload --
+      check_auth_user();
+      up.setOption('headers', {
+        "Access-Token": user_data.value.tokens.access_token
+      });
+    });
+
+    multi_uploader.bind('UploadProgress', function(up, file) {
+      $('#open_or_close_loading_field').removeClass('d-none');
+    });
+
+    multi_uploader.bind('Error', (up, err) => { // function
+      let message = '';
+      if (err.response) {
+        let message_error = JSON.parse(err.response);
+        message = message_error.message;       // set message to toast to tell user
+      } else {
+        message = err.message;
+      }
+      $('#open_or_close_loading_field').addClass('d-none'); // close loading background
+      toast_message(message, false);         // show toast
+
+      multi_uploader.refresh();
+    });
+
+    multi_uploader.bind('UploadComplete', function(upldr, file) {
+      multi_uploader.splice();
+
+      multi_uploader.refresh();
+    });
+
+    multi_uploader.bind('FileUploaded', (upldr, file, object) => {
+      var myData;
+      try {
+        // myData = eval(object.response);
+        myData = object.response ? JSON.parse(object.response) : '';
+      } catch(err) {
+        // myData = eval('(' + object.response + ')');
+        myData = '(' + object.response + ')';
+      }
+
+      // -------- add image upload to tmp and create in array to show in UI --------
+      // console.log("FileUploaded:");
+      // console.log(myData);
+      // console.log(myData.data.photo);
+
+      au_user['user']['cover'] = myData.data.photo;
+      user_data.value = au_user; // set new image upload to dom and change it self
+      img_cover.value = myData.data.photo.url;
+      localStorage.setItem("auth_user", JSON.stringify(user_data.value)); // set new to localStorage
+      $('#open_or_close_loading_field').addClass('d-none');
+      // -------- /add image upload to tmp and create in array to show in UI --------
+
+      multi_uploader.refresh();
+    });
+
+    plupload.addFileFilter('check_image_size', function(minRes, file, cb) {
+
+      // var self = this, img = new o.Image;           // old version of plupload 2.1.8
+      var self = this, img = new moxie.image.Image();  // new version of plupload 2.3.7
+      function finalize(result) {
+        var msg = "Please upload image at less "+minRes+"px width and "+minRes+"px height.";
+        if (img.width > 1000000 || img.height > 1000000) msg = "Image "+img.name+" too big.";
+        // if (img.width > 6500 || img.height > 6500) msg = "Image "+img.name+" too big.";
+        // cleanup
+        img.destroy();
+        img = null;
+        // if rule has been violated in one way or another, trigger an error
+        if (!result) {
+          self.trigger('Error', {
+            code : plupload.IMAGE_DIMENSIONS_ERROR,
+            message : msg,
+            file : file
+          });
+        }
+        cb(result);
+
+        // show loading when upload profile, if check file size true
+        if (result) { $('#open_or_close_loading_field').removeClass('d-none'); }
+
+      }
+      if (file.type!="image/gif") {
+        img.onload = function() {
+          // check if resolution cap is not exceeded
+          finalize((img.width > minRes && img.height > minRes) && (img.width < 1000000 && img.height < 1000000));
+          // finalize((img.width > minRes && img.height > minRes) && (img.width < 6500 && img.height < 6500));
+        };
+        img.onerror = function() {
+          finalize(false);
+        };
+        img.load(file.getSource());
+      } else {
+        finalize(1);
+      }
+    });
+
+  }
+
+  const arr_dt_data = useState('arr_dt_data',()=>[])
+  function ready_function_image_profile() {
+    // console.log('ready function');
+    var au_user = user_data.value;
+    // var counter = 1;
+    // var image = [];
+    // var limit = 8;
+    var max_size = 24;
+    // var maxRes = 1000000;
+    var multi_uploader = new plupload.Uploader({
+      runtimes : 'html5,flash,silverlight,html4',
+      browse_button: ["user_profile"],
+      url: config.VUE_APP_API_URL+'me/upload_profile',  // 'http://khmer24.snadai.io/v1.0/me/upload_profile',
+
+      max_file_size : max_size+'mb',
+      unique_names : true,
+      multi_selection: false, // upload multiple or single ( choose single = false; choose multiple = true )
+      chunk_size: '1mb',
+      resize : { width : 1500, height : 1400, quality : 100, crop: false },
+      filters : {
+        mime_types :[
+          {title : "Image files", extensions : "jpg,gif,png,jpeg"}
+        ],
+        check_image_size: 100
+      },
+
+  // drop_element : 'multi-upload',
+  flash_swf_url : 'plupload-2.3.9/Moxie.swf',
+  silverlight_xap_url : 'plupload-2.3.9/Moxie.xap',
+  headers: { "Access-Token": user_data.value.tokens.access_token },
+});
+
+    multi_uploader.init();
+
+    multi_uploader.bind('FilesAdded', function(up, files) {
+      multi_uploader.start();
+    });
+
+    multi_uploader.bind('BeforeUpload', (up, file) => {
+      // -- prevent when refresh token and uploader not get the token, so add access-token every upload --
+      check_auth_user();
+      up.setOption('headers', {
+        "Access-Token": user_data.value.tokens.access_token
+      });
+    });
+
+    multi_uploader.bind('UploadProgress', function(up, file) {
+      $('#open_or_close_loading_field').removeClass('d-none');
+    });
+
+    multi_uploader.bind('Error', (up, err) => {
+      if (err.response) {
+        let message_error = JSON.parse(err.response);
+        message_success.value = message_error.message;       // set message to toast to tell user
+      } else {
+        message_success.value = err.message;
+      }
+      $('#open_or_close_loading_field').addClass('d-none');   // close loading background
+      error_or_success_message.value = false;
+      let toast = $(".toast");
+      toast.removeClass('d-none');
+      toast.toast({ delay: 6000 });
+      toast.toast('show');
+
+      multi_uploader.refresh();
+
+    });
+
+    multi_uploader.bind('UploadComplete', function(upldr, file) {
+      multi_uploader.splice();
+
+      multi_uploader.refresh();
+
+    });
+
+    multi_uploader.bind('FileUploaded', (upldr, file, object) => {
+      var myData;
+      try {
+        // myData = eval(object.response);
+        myData = object.response ? JSON.parse(object.response) : '';
+      } catch(err) {
+        // myData = eval('(' + object.response + ')');
+        myData = '(' + object.response + ')';
+      }
+
+      // -------- add image upload to tmp and create in array to show in UI --------
+      // console.log("FileUploaded:");
+      // console.log(myData);
+      // console.log(myData.data.photo);
+
+      au_user['user']['photo'] = myData.data.photo;
+      user_data.value = au_user; // set new image upload to dom and change it self
+      img_pro.value = myData.data.photo.url;
+      // console.log('test',img_pro.value)
+      localStorage.setItem("auth_user", JSON.stringify(user_data.value)); // set new to localStorage
+      let user_cookies = helper.create_data_user_login(user_data.value);
+      VueCookieNext.setCookie('auth_user', user_cookies);
+      setTimeout(()=>{
+        const index = arr_dt_data.value.findIndex(item => item.id === user_data.value.user.id);
+        if (index !== -1) {
+          arr_dt_data.value[index] = { type: 'account', id: user_data.value.user.id, name: user_data.value.user.name, username: user_data.value.user.username, logo: user_data.value.user && user_data.value.user.photo ? user_data.value.user.photo.small.url : null };
+        } 
+      },50)
+      $('#open_or_close_loading_field').addClass('d-none');
+
+      // ---- change quick login in localStorage if profile change ----
+      let change_quick_data = { id: au_user['user']['id'], name: '', username: '', password: '', photo: myData.data.photo ? myData.data.photo.medium.url : '' }
+      helper.change_quick_login_data(change_quick_data);
+      // -------- /add image upload to tmp and create in array to show in UI --------
+
+      multi_uploader.refresh();
+    });
+
+    plupload.addFileFilter('check_image_size', function(minRes, file, cb) {
+      // var self = this, img = new o.Image;           // old version of plupload 2.1.8
+      var self = this, img = new moxie.image.Image();  // new version of plupload 2.3.7
+
+      function finalize(result) {
+        var msg = "Please upload image at less "+minRes+"px width and "+minRes+"px height.";
+        if(img.width > 1000000 || img.height > 1000000) msg = "Image <strong>"+img.name+"</strong> too big.";
+        // if(img.width > 6500 || img.height > 6500) msg = "Image <strong>"+img.name+"</strong> too big.";
+        // cleanup
+        img.destroy();
+        img = null;
+        // if rule has been violated in one way or another, trigger an error
+        if (!result) {
+          self.trigger('Error', {
+            code : plupload.IMAGE_DIMENSIONS_ERROR,
+            message : msg,
+            file : file
+          });
+        }
+        cb(result);
+
+        // show loading when upload cover, if check file size true
+        if (result) { $('#open_or_close_loading_field').removeClass('d-none'); }
+
+      }
+      if(file.type!="image/gif") {
+        img.onload = function() {
+          // check if resolution cap is not exceeded
+          finalize((img.width > minRes && img.height > minRes) && (img.width < 1000000 && img.height < 1000000));
+          // finalize((img.width > minRes && img.height > minRes) && (img.width < 6500 && img.height < 6500));
+        };
+        img.onerror = function() {
+          finalize(false);
+        };
+        img.load(file.getSource());
+      } else {
+        finalize(1);
+      }
+    });
+
+  }
+
+
+  const share = async (post) => {
+  if (resultCheck) {
+    if (navigator.share) {
+      try {
+        const dataShare = {
+          title: post.title || "",
+          text: "Check out this amazing content!",
+          url: post.short_link || "",
+        };
+  
+        console.log(dataShare)
+  
+        await navigator.share({
+          ...dataShare,
+        });
+        console.log("Content shared successfully!");
+      } catch (error) {
+        console.error("Error sharing:", error);
+      }
+    } else {
+      alert("Sharing not supported in your browser");
+    }
+  } else {
+    
+    alert("Desktop modal show");
+  } 
+};
+
+
+function detectMob(data) {
+
+  // check_screen_userAgent();
+  // if (check_screen_device.value) {
+  //   $("#modal_show_option_share").modal('hide');
+  //   phone_support_sharing(data); 
+  // } else {
+  //   $("#modal_show_option_share").modal('show');
+  // }
+}
+
+async function checkScreenUserAgent() {
+  const toMatch = [
+    /Android/i,
+    /webOS/i,
+    /iPhone/i,
+    /iPad/i,
+    /iPod/i,
+    /BlackBerry/i,
+    /Windows Phone/i
+  ];
+
+  const userAgent = navigator.userAgent
+
+  toMatch.forEach((ele) => {
+    if (userAgent.match(ele)) return resultCheck = true
+  })
+}
+
+
+function check_screen_userAgent() {
+  let check = false;
+  const toMatch = [
+    /Android/i,
+    /webOS/i,
+    /iPhone/i,
+    /iPad/i,
+    /iPod/i,
+    /BlackBerry/i,
+    /Windows Phone/i
+  ];
+
+  return toMatch.some((toMatchItem) => {
+    let march = navigator.userAgent.match(toMatchItem);
+    if (march) {
+      check = true; // in screen phone else screen pc
+    }
+    check_screen_device.value = check;
+    // return navigator.userAgent.match(toMatchItem);
+  });
+}
+
+function phone_support_sharing(d_p) {
+    let title = ''; let text = ''; let url = '';
+    if (d_p) { // -- media related post --
+        title = d_p.title ? d_p.title : '';
+        text = d_p.title + ' Cambodia on Khmer24.com.';
+        url = d_p.short_link ? d_p.short_link : '';
+    } else { // -- media detail post --
+        // just test
+        // title = d_p_full_detail.value.meta && d_p_full_detail.value.meta.title ? d_p_full_detail.value.meta.title : '';
+        // text = d_p_full_detail.value.meta && d_p_full_detail.value.meta.description ? d_p_full_detail.value.meta.description : '';
+        // url = d_p_full_detail.value.meta && d_p_full_detail.value.meta.url ? d_p_full_detail.value.meta.url : '';
+    }
+    // let image = d_p_full_detail.value.meta && d_p_full_detail.value.meta.image ? [d_p_full_detail.value.meta.image] : '';
+
+    if (navigator.share) {
+        let shareData = {
+            title: ''+title+'',
+            text: ''+text+'',
+            url: ''+url+'',
+            // files: ''+image+'',
+        }
+        navigator.share(shareData)
+            .then(() => { /*console.log('Successfully');*/ })
+            .catch((e) => { /*console.log('Error: ' + e);*/ });
+
+    // if in device phone, but navigator not support, must to show dialog share
+    } else {
+        $("#modal_show_option_share").modal('show'); // share media like in PC
+    }
+}
+
+function facebook_sharing() {
+  window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(''+ config.VUE_APP_BASE_URL+profile.value.username +''),'facebook-share-dialog','width=626,height=436'); return false;
+}
+
+function twitter_sharing() {
+  window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(''+ config.VUE_APP_BASE_URL+profile.value.username +''),'facebook-share-dialog','width=626,height=436'); return false;
+}
+
+function copy_link(link) {
+  document.getElementById('copy_link').focus();
+  document.execCommand('copy');
+  document.getElementById('copy_link').blur();
+
+  toast_message('Link copied to clipboard', true);
+}
+
+function check_auth_user() {
+  user_data.value = localStorage.getItem('auth_user') ? JSON.parse(localStorage.getItem('auth_user')) : '';
+}
+
+function save_tracking_user(user_track, clear_old) {
+  helper.params_make_condition('tracking', user_track);
+  helper.params_make_condition('clear', clear_old);
+}
+
+// ---- store all type params ----
+function save_track_optional(type, data_params) {
+  helper.params_make_condition(type, data_params);
+  GetAll.value = ''
+}
+
+// ---- check image error 404 must to show static image ----
+function imageUrlAlt_profile(the_event) { if (process.client && window.navigator.onLine) { the_event.target.src = empty_img_profile.value; } }
+function imageUrlAlt_post(the_event) { if (process.client && window.navigator.onLine) { the_event.target.src = empty_img_post.value; } }
+  
+function promote(data) { 
+  localStorage.setItem('cart_data', JSON.stringify({'id': data.id, 'type': 'ads'}))
+  router.push(localePath({ name: 'premium-ad-category', params: { category: ( data?.category_type?.slug || data?.category_type?.Slug ) ?? '' }, query: {'id': data.id }}))
+}
+
+async function getDeleteReasons() {
+  check_new_auth_user()
+  try {
+    const response = await $fetch(`${config.VUE_APP_API_URL}me/posts/delete_reasons?lang=${language.value}`, {
+      retry: 2,
+      retryDelay: 3000,
+      method: "GET",
+      headers: { "Access-Token": user_data.value.tokens.access_token }
+    })
+
+    if (response && response.data) {
+      attemptRequest.value = 0
+      deleteReasons.value = response.data;
+    }
+  } catch (error) {
+    if (!error.response) {
+      $('#deleteAdModal').modal('hide')
+      $('#modal_show_status_error_connection').modal('show');
+    } else {
+      if (error.response.status === 401) {
+        if(attemptRequest.value < 2) {
+          attemptRequest.value += 1
+          setTimeout(() => { getDeleteReasons() }, 3000);
+        } else {
+          $('#deleteAdModal').modal('hide')
+          localStorage.removeItem('auth_user')
+          router.replace(localePath({ name: 'index' }))  
+        }  
+      } else {
+        $('#deleteAdModal').modal('hide')
+        errorData.type = 'problem_occurs'
+        errorData.message = error?.response?._data?.message ?? null
+        $('#failModal').modal('show')
+      }
+    }
+  }
+}
+
+async function actionModal(action, data) {
+    switch (action) {
+        case 'edit':
+            closeModal('#actionModal');
+            router.push(localePath({ name: 'post-id', params: { id: data.id } }));
+            break;
+        case 'delete':
+            closeModal('#actionModal');
+            await getDeleteReasons();
+            deleteForm.type = 'active';
+            deleteForm.id = data.id;
+            showModal('#deleteAdModal');
+            break;
+        case 'availability':
+            closeModal('#actionModal');
+            markAvailability(data);
+            break;
+        case 'auto_renew':
+            closeModal('#actionModal');
+            set_auto_renew();
+            break;
+        case 'paid_ads':
+            closeModal('#actionModal');
+            changePremiumAd(data);
+            break;
+        case 'insights':
+            closeModal('#actionModal');
+            router.push(localePath({ name: 'insight-id', params: { id: data.id } }));
+            break;
+        default:
+            // console.error(`Unknown action: ${action}`);
+            break;
+    }
+}
+
+function closeModal(modalSelector) {
+    $(modalSelector).modal('hide');
+}
+
+function showModal(modalSelector) {
+    $(modalSelector).modal('show');
+}
+
+function hideModals(modalSelectors) {
+  // Hide modals using provided selectors
+  modalSelectors.forEach(selector => {
+      $(selector).modal('hide');
+  });
+}
+
+function resetDeleteForm() {
+    // Reset deleteForm values
+    deleteForm.type = '';
+    deleteForm.reason = '';
+    deleteForm.description = '';
+}
+
+function checkExist($event) {
+    if($event.data != null) typeing.value = true
+}
+
+async function submitDeleteReason() {
+
+  check_new_auth_user()
+  
+  if (deleteForm.reason == '') {
+    let msg;
+    if (language.value == 'en') {
+      msg = 'Please choose delete reason'
+    } else {
+      msg = 'សូមជ្រើសរើសហេតុផលនៃកាលុប'
+    }    
+    return toast_message(msg, false)    
+  }
+
+
+  // Validation for 'other' reason with description length
+  if (deleteForm.reason === 'other' && deleteForm.description.length < 10) {
+      $('#deleteReasone').focus();
+      return;
+  }
+
+  // Clear description if reason is not 'other'
+  if (deleteForm.reason !== 'other') {
+      deleteForm.description = '';
+  }
+
+  const deletePostForm = {
+      type: deleteForm.type,
+      reason: deleteForm.reason,
+      description: deleteForm.description
+  };
+
+  try {
+    const response = await $fetch(`${config.VUE_APP_API_URL}me/posts/${deleteForm.id}?lang=${language.value}`, { 
+      retry: 2,
+      retryDelay: 3000,
+      method: "DELETE",
+      headers: { "Content-Type": "application/x-www-form-urlencoded", "Access-Token": user_data.value.tokens.access_token },
+      body: new URLSearchParams(deletePostForm).toString()
+    });
+
+    attemptRequest.value = 0
+
+    if (response) {
+      // Reset form and hide modals
+      resetDeleteForm();
+      hideModals(['#actionModal', '#deleteAdModal']);
+
+      // Show success toast message
+      successToastMessage.value = "success_delete";
+      successToast.value.show();
+      setTimeout(() => {
+          successToast.value.hide();
+      }, 2000);
+
+      // Refresh user posts
+      typeing.value = false
+      pageSize.value = 0
+      posts.value = []
+      getPostByUser();
+    }
+  } catch (error) {
+    if (!error.response) {
+      $('#deleteAdModal').modal('hide')
+      $('#modal_show_status_error_connection').modal('show');
+    } else {
+      if (error.response.status === 401) {
+        if(attemptRequest.value < 2) {
+          attemptRequest.value += 1
+          setTimeout(() => { submitDeleteReason() }, 3000);
+        } else {
+          $('#deleteAdModal').modal('hide')
+          localStorage.removeItem('auth_user')
+          router.replace(localePath({ name: 'index' }))  
+        }  
+      } else {
+        $('#deleteAdModal').modal('hide')
+        errorData.type = 'problem_occurs'
+        errorData.message = error?.response?._data?.message ?? null
+        $('#failModal').modal('show')
+      }
+    }
+  }
+}
+
+async function getPostByUser() {
+  check_new_auth_user()
+  pageSize.value = 0
+  const queries = {
+    lang: language.value,
+    offset: 0,
+    fields: 'id,title,price,photo,thumbnail,views,renew_date,posted_date,last_update,link,auto_renew,is_premium,status,total_like,total_comment,total_job_application,category_type,availability,location',
+    functions: 'shipping,apply_job,insights',
+  }
+  const urlQuery = route.query
+  delete urlQuery["check_tap"];
+  urlQuery["keyword"] = keyword.value 
+  for (let [key, value] of Object.entries(urlQuery)) {
+    queries[key] = value;
+  }
+
+  try {
+    const res = await $fetch(config.VUE_APP_API_URL + 'me/posts', { 
+      retry: 2,
+      retryDelay: 3000,
+      method: 'GET',
+      query: queries,
+      headers: { "Access-Token": user_data.value.tokens.access_token }
+    })
+    attemptRequest.value = 0
+    if (res) {
+      pageSize.value += res.limit;
+      if (res.data.length) {
+        posts.value = res.data; 
+      }
+      if (res.available_paid_ads) {
+        availablePaidAds.value = res.available_paid_ads
+      }
+    }
+  } catch (error) { 
+    if (!error.response) {
+      $('#modal_show_status_error_connection').modal('show');
+    } else {
+      if (error.response.status === 401) {
+        if(attemptRequest.value < 2) {
+          attemptRequest.value += 1
+          setTimeout(() => { getPostByUser() }, 3000);
+        } else {
+          localStorage.removeItem('auth_user')
+          router.replace(localePath({ name: 'index' }))  
+        }    
+      } else {
+        errorData.type = 'problem_occurs'
+        errorData.message = error?.response?._data?.message ?? null
+        $('#failModal').modal('show')
+      }
+    }
+  }
+}
+
+async function renewAd(data) {
+  check_new_auth_user()
+  try {
+
+    const response = await $fetch(`${config.VUE_APP_API_URL}me/posts/${data.id}/renew?lg=${language.value}`, {
+      retry: 2,
+      retryDelay: 3000,     
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded", "Access-Token": user_data.value.tokens.access_token }
+    })
+
+    if (response) {
+      const buttonRenew = document.getElementById(`${data.id}`);
+      if (buttonRenew) {
+        buttonRenew.disabled = true
+        buttonRenew.classList.add('disable_text')
+      }
+      successToastMessage.value = "success_renew";
+      successToast.value.show();
+      setTimeout(() => {
+        successToast.value.hide();
+      }, 2000);
+    }
+  } catch (error) {
+    if (!error.response) {
+      $('#modal_show_status_error_connection').modal('show')
+    } else {
+      if (error.response.status === 401) {
+        localStorage.removeItem('auth_user')
+        router.replace(localePath({ name: 'index' }))  
+      } else {
+        errorData.type = 'renew_fail';
+        errorData.message = error?.response?._data?.message ?? null;
+        $('#failModal').modal('show');
+      }
+    }
+  }
+}
+
+async function markAvailability(data) {
+  check_new_auth_user()
+  const availabilityFormData = new FormData()
+  availabilityFormData.append('id', parseInt(data.id))
+  availabilityFormData.append('status', !data.availability)
+  try {
+    const response = await $fetch(config.VUE_APP_API_URL+`me/posts/availability?lg=${language.value}`, { 
+      retry: 2,
+      retryDelay: 3000,
+      method: "POST", 
+      headers: { "Content-Type": "application/x-www-form-urlencoded", "Access-Token": user_data.value.tokens.access_token }, 
+      body: new URLSearchParams(availabilityFormData).toString()
+    })
+
+    if(response){
+      $('#actionModal').modal('hide') 
+      successToastMessage.value = data.availability ? "success_mark_un" :  "success_mark_av" 
+      successToast.value.show()
+      setTimeout(function() {
+        successToast.value.hide()
+      }, 3000)
+      getPostByUser()
+    }
+  } catch (error) {
+    if (!error.response) {
+      $('#actionModal').modal('hide') 
+      $('#modal_show_status_error_connection').modal('show');
+    } else {
+      if (error.response.status == 401) {
+        $('#actionModal').modal('hide') 
+        localStorage.removeItem('auth_user')
+        router.replace(localePath({ name: 'index' }))  
+      } else {
+        errorData.type = 'problem_occurs'
+        errorData.message = error?.response?._data?.message ?? null
+        $('#failModal').modal('show')
+      }
+    }
+  } 
+}
+
+function copyPostURL(text) {  
+  navigator.clipboard.writeText(text).then(() => {
+    showSuccessToast('success_copied');
+  }).catch(err => {
+    console.error('Unable to copy to clipboard', err);
+  }).finally(() => {
+    // This will execute after the promise is either resolved or rejected
+    $('#modal_show_option_share').modal('hide');
+  });
+}
+
+async function sharePostURL(url) {
+  shareButtonSipining.value = true
+  setTimeout(() => { 
+    $('#mobileShareModal').modal('hide') 
+    $('#mobileSocialMediaModal').modal('show') 
+    shareButtonSipining.value = false
+    shortLink.value = url
+  }, 1000)
+}
+
+function showSuccessToast(message) {
+    successToastMessage.value = message
+    successToast.value.show()
+    setTimeout(() => { successToast.value.hide() }, 3000)
+}
+
+function showErrorToast(message) {
+    errorToastMessage.value = message
+    errorToast.value.show()
+    setTimeout(() => { errorToast.value.hide() }, 3000)
+}
+
+function sharePostTofacebook() {
+  // connection is online
+  if (window.navigator.onLine) {
+      window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(''+dataShareModal.value.link+''),'facebook-share-dialog','width=626,height=436');
+      return false;
+  // connection error
+  } else {
+      $('#modal_show_status_error_connection').modal('show');
+  }
+}
+
+function sharePostToTwitter() {
+    // connection is online
+    if (window.navigator.onLine) {
+        window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(''+dataShareModal.value.link+''),'facebook-share-dialog','width=626,height=436');
+        return false;
+    // connection error
+    } else {
+        $('#modal_show_statu_error_connection').modal('show');
+    }
+} 
+
+function setsAd(data) {
+  paidAdItem.value = data
+  changeAd.value = false
+  filterMyAd.category_type = data.category_type.slug
+  $('#myChangeAdsModal').modal('show')
+}
+
+function changePremiumAd(data) {
+  paidAdItem.value = data
+  changeAd.value = true 
+  filterMyAd.category_type = data.category_type.slug
+  $('#myChangeAdsModal').modal('show')
+}
+
+async function getAd(myAdOffsetValue, categoryType='') {
+  const queries = {
+    'offset': myAdOffsetValue,
+    'fields': 'id,title,price,photo,thumbnail,views,renew_date,posted_date,link',
+    'functions': 'shipping,apply_job',
+    'category_type': categoryType,
+    'paid_ads': false
+  }
+
+  try {
+    const response = await $fetch(config.VUE_APP_API_URL+`me/posts`, {
+      query: queries,
+      headers: { "Access-Token": user_data.value.tokens.access_token },
+    }) 
+    return response ? response : null
+  } catch (error) {
+    if (!error.response) {
+      $('#modal_show_status_error_connection').modal('show');
+    }
+    else if (error.response && error.response.status === 401) {
+      localStorage.removeItem('auth_user')
+      router.replace(localePath({ name: 'index' }))     
+    }
+  }
+}
+
+async function loadAd({ loaded, noMore, noResults }) {
+  check_new_auth_user()
+  try {
+    const loadedMyAd = await getAd(myAdOffset, filterMyAd.category_type);
+    if(myAd.value.length && !loadedMyAd.data) noMore() 
+    if(!myAd.value.length && !loadedMyAd.data) noResults() 
+    myAd.value.push(...loadedMyAd.data);
+    myAdOffset += loadedMyAd.data.length
+    loaded(loadedMyAd.data.length, loadedMyAd.limit);
+    
+  } catch (err) {
+    // console.error(err)
+  }
+}
+
+function navigateMyAdModalContent(id) {
+  if(id == '#changePremiumContent') {
+      $('#changePremiumContent').addClass('d-none')
+      $('#myadsContent').removeClass('d-none')
+  } else {
+      $('#myadsContent').addClass('d-none')
+      $('#changePremiumContent').removeClass('d-none')
+  }
+}
+
+async function submitSetOrChangePaidAd() {
+  check_new_auth_user()
+  const changePaidAdForm = new FormData()
+  changePaidAdForm.append('adid', changePaidAdFormData?.adid ?? null)
+
+  if(changeAd.value == true) {
+    changePaidAdForm.append('id', paidAdItem.value?.premium?.id ?? null)
+  } else {
+    changePaidAdForm.append('id', paidAdItem.value?.id ?? null)
+  }
+
+  try { 
+    const response = await $fetch(config.VUE_APP_API_URL+`me/posts/change_paid_ad?lang=${language.value}`, {
+      retry: 2,
+      retryDelay: 3000,
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded", "Access-Token": user_data.value.tokens.access_token },
+      body: new URLSearchParams(changePaidAdForm).toString()
+    }) 
+    
+    if(response) {
+      attemptRequest.value = 0
+      $('#myChangeAdsModal').modal('hide')
+      showSuccessToast(changeAd.value == true ? 'success_change' : 'success_set')
+      pageSize.value = 0
+      posts.value = []
+      isInitial.value = true
+    }
+  } catch (error) {
+    if(!error.response) {
+      $('#myChangeAdsModal').modal('hide');
+      $('#modal_show_status_error_connection').modal('show');
+    } else {
+      if(error.response.status == 401) {
+        if(attemptRequest.value < 2) {
+          attemptRequest.value += 1
+          setTimeout(() => { submitSetOrChangePaidAd() }, 3000);
+        } else {
+          $('#myChangeAdsModal').modal('hide');
+          localStorage.removeItem('auth_user')
+          router.replace(localePath({ name: 'index' }))  
+        }     
+      }
+      else if(error.response.status == 404) {
+        $('#myChangeAdsModal').modal('hide');
+        errorData.type = 'problem_occurs'
+        errorData.message = error?.response?._data?.message ?? null
+        $('#failModal').modal('show')
+      } else if (error.response.status == 503) {
+        $('#myChangeAdsModal').modal('hide');
+        errorData.type = 'problem_occurs'
+        errorData.message = error?.response?._data?.message ?? null
+        $('#failModal').modal('show')
+      } else if (error.response._data && error.response._data.message) {
+        $('#myChangeAdsModal').modal('hide');
+        errorData.message = error?.response?._data?.message ?? null
+        $('#changeAdErrorModal').modal('show')
+      }
+    }
+  }
+}
+
+function checkSubscription(data) {
+  if(data && data.premium.subscription_id) {
+    router.push(localePath({ name: 'account-subscriptions-id', params: { id: data.premium.subscription_id }}))
+  } else {
+    if (data && data.status === 'block') {
+      return showErrorToast(data?.status_message ?? '')
+    }
+    show_detail(data.title, data.id)
+  }
+}
+
+watch(() => deleteForm.reason, async (val) => {
+  if (val === 'other') {
+      await nextTick();
+      const element = $('#deleteReasone');
+      if (element.length) {
+        element.focus();
+      } else {
+      }
+  }
+})
+
+</script>

@@ -45,7 +45,7 @@ const share = async (post) => {
       try {
         const dataShare = {
           title: post.data.title || "",
-          text: "Check out this amazing content!",
+          text: " Check out this amazing content! ",
           url: post.data.short_link || "",
         };
     
@@ -77,17 +77,12 @@ async function checkScreenUserAgent() {
     /Windows Phone/i
   ];
 
-  
   const userAgent = navigator.userAgent
 
   toMatch.forEach((ele) => {
     if (userAgent.match(ele)) return resultCheck = true
   })
-
-  console.log(resultCheck)
 }
-
-
 
 
 onMounted(() => {
