@@ -90,7 +90,7 @@ const share = (data) => {
   // Data to share
   const shareData = {
     title: data.data.title,
-    text: data.data.title + " Cambodia on Khmer24.com",
+    text: data.data.title,
     url: data.data.short_link,
   };
 
