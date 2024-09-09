@@ -15,7 +15,7 @@
 </template>
  
     <script setup>
-const baseApiUrl = `https://api-posts.khmer24.com/`;
+const baseApiUrl = `https://test-posts.khmer24.com/`;
 const router = useRouter();
 const dataPosts = ref([]);
 const { isDesktop: isDesktopUseDevice, isMobile } = useDevice() 
@@ -87,12 +87,16 @@ async function checkScreenUserAgent() {
 }
 
 const share = (data) => {
+
+  let url = data.data.short_link.replace('https://www.khmer24.com', 'https://m.khmer24.com');
   // Data to share
   const shareData = {
-    title: data.data.title + " Cambodia on Khmer24.com. ",
+    title: data.data.title + " Cambodia on Khmer24.com ",
     // text: data.data.title,
-    url: data.data.short_link,
+    url: url,
   };
+
+
 
   // Check if the browser supports sharing some or all of these properties
   if (navigator.canShare) {
