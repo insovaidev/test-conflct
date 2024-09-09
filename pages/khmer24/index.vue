@@ -44,7 +44,7 @@ const share = async (post) => {
   await checkScreenUserAgent()
 
   if (resultCheck) {
-    if (navigator.canShare) {
+    if (navigator.canShare()) {
       try {
         await navigator.share({
           title: title,
