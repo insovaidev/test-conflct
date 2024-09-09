@@ -17,6 +17,7 @@
 const baseApiUrl = `https://api-posts.khmer24.com/`;
 const router = useRouter();
 const dataPosts = ref([]);
+const { isDesktop: isDesktopUseDevice } = useDevice() 
 const screenNavigateShare = ref(false) 
 
 const getPosts = async () => {
@@ -36,7 +37,7 @@ const toDetail = (title, id) => {
 
 const share = async (post) => {
   await checkScreenUserAgent()
-  if (screenNavigateShare.value) {
+  if (!isDesktopUseDevice) {
     if (navigator.share) {
       try {
         const dataShare = {
@@ -44,9 +45,7 @@ const share = async (post) => {
           text: "Check out this amazing content!",
           url: post.data.short_link || "",
         };
-  
-        console.log(dataShare)
-  
+    
         await navigator.share({
           ...dataShare,
         });
@@ -76,13 +75,13 @@ async function checkScreenUserAgent() {
     /Windows Phone/i
   ];
 
-  return toMatch.some((toMatchItem) => {
-    let march = navigator.userAgent.match(toMatchItem);
-    if (march) {
-      check = true;
-    }
-    screenNavigateShare.value = check;
-  });
+  // return toMatch.some((toMatchItem) => {
+  //   let march = navigator.userAgent.match(toMatchItem);
+  //   if (march) {
+  //     check = true;
+  //   }
+  //   screenNavigateShare.value = check;
+  // });
 }
 
 

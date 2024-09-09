@@ -11,6 +11,7 @@
     "push": "git add . && git commit -m 'justpush' && git push origin master"
   },
   "dependencies": {
+    "@nuxtjs/device": "^3.2.2",
     "nuxt": "^3.11.1",
     "nuxt-gtag": "^2.1.0",
     "nuxt-jsonld": "^2.0.8",
