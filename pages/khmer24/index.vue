@@ -45,7 +45,7 @@ const share = async (post) => {
       try {
         const dataShare = {
           title: post.data.title || "",
-          text: " Check out this amazing content! ",
+          text: post.data.title + " Check out this amazing content! ",
           url: post.data.short_link || "",
         };
     
