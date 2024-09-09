@@ -31,22 +31,1218 @@
         </header>
     </div>
 
-    <div class="max_width_form ">
-      <div :key="post" v-for="post in posts" class="list_post">
-      <div
-        class="border-[1px] rounded-md mb-2 p-2"
-      >
-        <p>{{ post.id }}</p>
-        <p>{{ post.title }}</p>
+ <div class="max_width_form ">
+  <!-- Profile User -->
+  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no_padding" :class="isDesktop ? 'mt-3' : 'margin_below_app_bar'">
+    <div class="large-12 columns borders" :class="isDesktop ? 'dt_border' : ''">
+      <div class="position_relative">
+        <!-- cover (cover not exist, show background color) -->
+        <div v-if="img_cover || (user_data && user_data.user && user_data.user.cover)"  class="u_logo_height_vh position-relative">
+          <div class="blur-profile-content">
+            <!-- blur -->
+            <div class="blur-profile-img" v-if="img_cover" v-bind:style="{ backgroundImage: 'url(' + img_cover + ')' }"></div>
+            <div class="blur-profile-img" v-else-if="user_data && user_data.user && user_data.user.cover" v-bind:style="{ backgroundImage: 'url(' + user_data.user.cover.medium.url + ')' }"></div>
+            <!-- display image -->
+            <img :src="img_cover ? img_cover : (user_data && user_data.user && user_data.user.cover ? (check_screen_width ? user_data.user.cover.large.url : user_data.user.cover.medium.url) : empty_img_user)"
+                id="set_img_cover" @click="show_or_change_pro('cover')" :alt="user_data && user_data.user ? user_data.user.name : ''" class="logo_profile_d_user cur_sur">
+          </div>
+          <a rel="nofollow" aria-label="photo" ref="ref_cover" :href="img_cover ? img_cover : (user_data && user_data.user && user_data.user.cover ? user_data.user.cover.url : empty_img_user)" data-fancybox="photo1"></a>
+        </div>
+        <div v-else @click="change_cover_empty" class="u_logo_height_px position-relative bg_parent_color cur_sur"></div>
+        <div class="a_edit_cover">
+          <a rel="nofollow" aria-label="pencil" id="cover_profile" href="javascript:void (0)">
+            <i class="fas fa-pencil-alt a_mr_icon_cover"></i>
+          </a>
+        </div>
+
+            <!-- profile -->
+            <div class="a_absolute_pro_acc">
+              <a rel="nofollow" aria-label="profile" ref="ref_profile" :href="img_pro ? img_pro : (user_data && user_data.user && user_data.user.photo ? user_data.user.photo.url : empty_img_user)" data-fancybox="photo2"></a>
+              <!--<a rel="nofollow" id="show_pro" :href="img_pro ? img_pro : (user_data && user_data.user && user_data.user.photo ? user_data.user.photo.large.url : empty_img_user)" data-fancybox="photo2"></a>-->
+              <a rel="nofollow" aria-label="photo" href="javascript:void(0)" class="position-relative">
+                <img id="set_img_profile" @click="show_or_change_pro('profile')" :src="img_pro ? img_pro : (user_data && user_data.user && user_data.user.photo ? user_data.user.photo.medium.url : empty_img_user)"
+                    :alt="user_data && user_data.user ? user_data.user.name : ''" class="profile_user bg-white u_profile_style_" @error="imageUrlAlt_profile">
+                <div class="a_edit_profile">
+                  <a rel="nofollow" id="user_profile" aria-label="pencil" href="javascript:void (0)">
+                    <i class="fas fa-pencil-alt a_mr_icon"></i>
+                  </a>
+                </div>
+              </a>
+            </div>
+          </div>
+          <!-- show user -->
+          <div class="a_more_obtions bg-white">
+            <div class="a_head_obtions">
+              <NuxtLink :to="localePath({ name: 'setting-edit-profile' })"  class="btn btn-sm border-edit-p">
+                  {{ $t('message.edit_profile') }}
+              </NuxtLink>
+              <template v-if="isDesktop">
+                <a rel="nofollow" aria-label="share" href="javascript:void(0)" @click="detectMob" class="dt_acc_setting btn btn-outline-secondary">
+                    <i class="icon-share1"></i>
+                </a>
+                <NuxtLink :to="localePath({ name: 'setting' })" aria-label="setting" class="dt_acc_setting btn btn-outline-secondary">
+                    <i class="fas fa-cog"></i>
+                </NuxtLink>
+              </template>
+            </div>
+            <div class="a_body_description">
+              <div>
+
+                <div class="d-flex align-items-center justify-content-start gap-2 mb-1">
+                  <h1> {{ user_data && user_data.user ? user_data.user.name : '' }}</h1>
+                  <span class="profile_verify_icon _fs_16" v-if="user_data?.user?.is_verify"><i class="bi bi-patch-check-fill"></i></span>
+                </div>
+                <div v-if="user_data && user_data.user && user_data.user.membership" class="d-flex justify-content-start align-items-center _mb_4" >
+                  <p> {{ user_data && user_data.user && user_data.user.username ? '@'+user_data.user.username : '' }} </p>
+                  <NuxtLink :to="localePath({ name: 'account-membership' })" class="member_type ms-2 cur_sur">
+                    {{ user_data.user.membership.title }}
+                  </NuxtLink>
+                </div>
+                <div v-else-if="user_data && user_data.user && !user_data.user.membership">
+                  <div class="d-flex justify-content-start align-items-center _mb_4">
+                    <p> {{ user_data && user_data.user && user_data.user.username ? '@'+user_data.user.username : '' }} </p>
+                    <NuxtLink :to="localePath({ name: 'account-membership' })" class="member_type ms-2 cur_sur">
+                      Basic
+                    </NuxtLink>
+                  </div>
+                </div>
+              </div>
+              <div v-if="count_follow" class="cont-follow">
+                <div class="c-follow-1 cur_sur" @click="show_follows('followers',parseInt(count_follow.followers) > 0 ? true : false)">
+                  <span>{{ parseInt(count_follow.followers) > 0 ? count_follow.followers : 0 }}</span>
+                  {{ $t('new_text_3.followers') }}
+                </div>
+                <!--<template v-if="profile.type === 'user'">-->
+                  &#8226;
+                  <div class="c-follow-2 cur_sur" @click="show_follows('following',parseInt(count_follow.following) > 0 ? true : false)">
+                    <span> {{ parseInt(count_follow.following) > 0 ? count_follow.following : 0 }}</span>
+                    {{ $t('new_text_3.following') }}
+                  </div>
+                <!--</template>-->
+              </div>
+              <!-- <template v-if="user_data && user_data.user">
+                <div v-if="user_data && user_data.user && user_data.user.membership" class="_flex_">
+                  <p>{{ $t('message.member') }}</p>
+                  <NuxtLink :to="localePath({ name: 'account-membership' })" class="member_type ml-2 cur_sur">
+                    {{ user_data.user.membership.title }}
+                  </NuxtLink>
+                </div>
+              </template> -->
+            </div>
+          </div>
+
+        </div>
       </div>
-      <button @click="share(post)">Shere</button>
+
+  <!-- Fields user have action -->
+  <div v-if="isMobile">
+    <div class="a_content_s_fields d-flex flex-wrap" :class="isDesktop ? 'dt_border' : ''" style="justify-content: unset;">
+      <NuxtLink :to="localePath({ name: 'account-liked' })" @click="save_track_optional('clear_old_data', { clear_old_data: 'clear' })" class="col-style p-0 text-center cur_sur">
+        <i class="fa fa-heart"></i>
+        <div>
+          <div>
+            <p>{{ $t('new_text.likes') }}</p>
+          </div>
+        </div>
+      </NuxtLink>
+      <NuxtLink :to="localePath({ name: 'account-saved' })" @click="save_track_optional('clear_old_data', { clear_old_data: 'clear' })" class="col-style p-0 text-center cur_sur" id="m_w">
+        <i class="fa fa-bookmark"></i>
+        <div>
+          <div>
+            <p>{{ $t('new_text.saved') }}</p>
+          </div>
+        </div>
+      </NuxtLink>
+      <NuxtLink :to="localePath({ name: 'account-apply-jobs' })" @click="save_track_optional('clear_old_data', { clear_old_data: 'clear' })" class="col-style p-0 text-center cur_sur">
+        <i class="fas fa-briefcase"></i>
+        <div>
+          <div>
+            <p>{{ $t('new_text.a_p') }}</p>
+          </div>
+        </div>
+      </NuxtLink>
+      <NuxtLink :to="localePath({ name: 'account-job-applications' })" @click="save_track_optional('clear_old_data', { clear_old_data: 'clear' })" class="col-style p-0 text-center cur_sur" >
+        <i class="fas fa-clipboard-list"></i>
+        <span v-if="total_job_applications > 0" class="badge bg-danger" style="position:absolute;font-size:10px">{{ total_job_applications }}</span>
+        <div>
+          <div>
+            <p>{{ $t('new_text.job_application') }}</p>
+          </div>
+        </div>
+      </NuxtLink>
+      <!-- <NuxtLink v-if="!personal.name" :to="localePath({ name: 'account-resume-start' })" class="col-style p-0 text-center cur_sur" id="m_w">
+        <i class="fas fa-address-card"></i>
+        <div>
+          <div>
+            <p>{{ $t('resume_cv.resume') }}</p>
+          </div>
+        </div>
+      </NuxtLink> -->
+      <NuxtLink :to="localePath({ name: 'account-resume' })" @click="resume" class="col-style p-0 text-center cur_sur" id="m_w">
+        <i style="position: relative;" class="fas fa-address-card">
+          <img v-if="check_cl_re" :src="asset_url+'icon/spark.gif'" alt="" style="width: 43px;position: absolute;top: -35%;left: -7%;">
+        </i>
+        <div>
+          <div>
+            <p>{{ $t('resume_cv.resume') }}</p>
+          </div>
+        </div>
+      </NuxtLink>
+      <NuxtLink v-if="user_data?.user?.setting?.payment && user_data.user.setting.payment.includes('subscription')" :to="localePath({ name: 'account-subscriptions' })"  class="col-style p-0 text-center cur_sur" >
+        <i class="fas"><img :src="asset_url+'icon/dolla.png'" alt="" style="width: 20px;border-radius: 5px;"></i>
+        <div>
+          <div>
+            <p>{{ $t('account_t.subscription') }}</p>
+          </div>
+        </div>
+      </NuxtLink>
+    </div>
+  </div>
+
+      <!-- Fields Store -->
+      <div v-if="store.length > 0 && isMobile" class="a_con_store_fields border" :class="isDesktop ? 'dt_border' : ''">
+        <p class="title_s_con mb-2">{{ $t('new_text_1.store') }}</p>
+        <template v-for="st in store" :key="st" >
+          <div class="store_link_wrapper">
+
+          <NuxtLink :to="localePath({ name: 'account-store-id', params: { id: st.id } })" class="store_list_wrapper" >
+            <div class="store_profile_left">
+              <!-- {{ st }} -->
+                <div class="store_profile_left_profile">
+                  <img v-if="st.logo && st.logo.small" :alt="st && st.username ? st.username : ''" :src="st.logo.small.url" />
+                  <i v-else class="bi bi-buildings text-secondary"></i>
+                </div>
+                <div>
+                    <p class="mb-0 store_user_name">{{st && st.title ? st.title : ''}}</p>
+                    <p class="mb-0 store_name" >{{st && st.username ? '@'+st.username : ''}}</p>
+                </div>
+            </div>
+            <i class="ion-ios-arrow-forward flex-1"></i>
+          </NuxtLink>
+        </div>
+
+        </template>
       </div>
-      <VueEternalLoading :load="get_active_post" v-model:is-initial="isInitial" :key="key_initial" v-if="key_initial > 1" margin="800px"></VueEternalLoading>
+
+      <!-- Fields user have action -->
+      <div class="a_content_search_fields border" :class="isDesktop ? 'dt_border' : ''">
+        <h2> {{ $t('new_text_1.manage_my_ads') }} </h2>
+        <!-- Search && Category -->
+        <div  class="style_flex" v-if="profile && profile.member_type != 1">
+          <div class="col-6 col_search">
+            <div class="input-group a_border_box_search">
+              <!-- button search -->
+              <div class="input-group-append group_field_search_box">
+                <button @click="click_search('')" aria-label="search" class="btn" type="button">
+                  <i class="ion-android-search"></i>
+                </button>
+              </div>
+              <!-- input search -->
+              <input type="text" autocomplete="off" maxlength="255" class="form-control field-input-height p-1" id="search_field" v-on:keyup="keymonitor" v-model="keyword" v-bind:placeholder="$t('message.search')+'...'">
+              <!-- clear search input -->
+              <div v-if="the_route && the_route.query && the_route.query.keyword" @click="click_search('clear_keyword')" class="text-center a_icon_clear_search">
+                <i class="fas fa-minus-circle"></i>
+              </div>
+            </div>
+          </div>
+          <div class="col-6 col_category">
+            <a rel="nofollow" href="javascript:void (0)" class="style_flex a_choose_category a_border_box_search">
+              <div @click="show_pop_up_category" class="col-11 p-0">
+                <p v-if="the_route && the_route.query && the_route.query.category_name" class="truncate sub_category_margin a_mar_cat"> {{ the_route.query.category_name }} </p>
+                <p v-else class="truncate sub_category_margin a_mar_cat text_grey"> {{ $t('message.all_category') }} </p>
+              </div>
+              <div v-if="the_route && the_route.query && the_route.query.category_name && the_route.query.category" @click="click_search('clear_category')" class="a_btn_clear_cate">
+                <i class="fas fa-minus-circle text-danger a_mar_cat_icon"></i>
+              </div>
+              <div v-else class="col-1 text-center a_p_t_cate">
+                <i class="ion-ios-arrow-forward a_style_btn_search a_mar_cat_icon p-0"></i>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- second Tap of tap Ads -->
+        <ul id="ac_ch_tab" role="tablist" class="a_nav_custom nav-pills" :class="profile && profile.member_type != 1 ? '' : 'm-0'">
+          <li @click="click_search('tab_active')" role="presentation" class="col nav-item">
+            <a rel="nofollow" id="active_tap" data-bs-toggle="pill" href="#pills_active" role="tab" aria-controls="pills-home"
+              :aria-selected="tap_active_or_expire === 'active' ? 'true' : 'false'"
+              :class="tap_active_or_expire === 'active' || !tap_active_or_expire ? 'nav-link active' : 'nav-link'">
+              {{ $t('new_text.active') }} ({{ counts ? counts.active : '0' }})
+            </a>
+          </li>
+          <li @click="click_search('tab_expired')" role="presentation" class="col nav-item">
+            <a rel="nofollow" id="expired_tap" data-bs-toggle="pill" href="#pills_expired" role="tab" aria-controls="pills-profile"
+              :aria-selected="tap_active_or_expire === 'expired' ? 'true' : 'false'"
+              :class="tap_active_or_expire === 'expired' ? 'nav-link active' : 'nav-link'">
+              {{ $t('new_text.expired') }} ({{ counts ? counts.expired : '0' }})
+            </a>
+          </li>
+        </ul>
+        <button v-if="!isMobile && posts.length > 0" @click="btn_create_post" type="button" class="btn btn-k24-secondary km fn_20 ms-auto mt-3" :class="isMobile ? 'btn-height' : 'dt-btn-height'" id="desktop_ads_new_post">
+            <i class="icon-camera icon_post_user"></i>
+            <span class="ms-1">{{ $t('message.sell') }}</span>
+        </button>
+      </div>
+      <!-- if user not verify phone number -->
+      <template v-if="user_data && user_data.user && user_data.user.phone_activated === false">
+        <div class="no_more_result p-2 cur_sur" @click="show_verify_phone_number">
+          <div class="s_parent_content_activate">
+            <div class="_flex_">
+              <div class="activate_phone_number_icon">
+                <i class="fas fa-mobile-alt"></i>
+              </div>
+              <div class="s_content_activate_phone">
+                <div>
+                  <p class="truncate s_content_p1">{{ $t('new_text_1.text_acc_ver_title') }}</p>
+                  <p class="s_content_p2"> {{ $t('new_text_1.text_acc_ver_content') }} </p>
+                </div>
+              </div>
+            </div>
+            <i class="ion-ios-arrow-forward s_content_arrow_activate"></i>
+          </div>
+          <br><br><br>
+        </div>
+      </template>
+
+          <!-- Content Tab -->
+          <div v-else class="tab-content" id="pills-tabContent">
+            <!-------------------- Tap Ads -------------------->
+            <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-ads">
+              <div class="tab-content mx-1 mx-md-0"> <!-- must to add this because it class prevent error style multiple tap in tap -->
+                <!------- Tap show active post ------->
+                <div :class="tap_active_or_expire === 'active' || !tap_active_or_expire ? 'tab-pane fade show active' : 'tab-pane fade show'" id="pills_active" role="tabpanel" aria-labelledby="active_tap">
+                  
+                  <!-- Available Ads -->
+                  <template v-if="availablePaidAds">
+                    <div :class="isMobile ? 'ad_category_wrapper' : 'ad_category_wrapper_desktop'">
+                      <div @click="changePaidAdFormData.id = item.id, setsAd(item)" :key="item.id" v-for="item in availablePaidAds" class="ad_category">
+                        <p class="text-capitalize ad_category_title _fs_16 _mb_4">{{ item.title ?  item.title : '' }}</p>
+                        <p class="text-capitalize ad_category_date_category _fs_14 mb-0">{{ $t(`account_t.cate`)}}: {{ item.category_type && item.category_type ?  item.category_type.title: ''}}</p>
+                        <p class="text-capitalize ad_category_date_category _fs_14 _mb_10">{{ $t(`account_t.valid_until`)}}: {{ forMatDate(item.end_date) }}</p>
+                        <button class="ad_category_set_ad_btn">{{ $t('account_t.set_ad_btn')}}<i class="bi bi-chevron-right"></i></button>
+                      </div>
+                    </div>
+                  </template>
+                  <template v-if="posts">
+                    <div v-for="data in posts" :key="data" :class="!isMobile ? 'mb-1' : ''" class="_flex_" :id="'item_'+data.id">
+                      <div class="col-12 no_padding" >
+                        <div :class="isMobile ? 'pad_list_ overwrite_pad_list' : ''">
+                          <!-- Ads / Posts Card -->
+                          <div class="manage_posts_card mb-2">
+                            <!-- show status on post -->
+                            <div v-if="data.status === 'block'" class="a_status_post a_color_code_red">
+                              <div class="ic-warn-acc-con">
+                                <i class="fas fa-exclamation-circle font_15 p-1 pr-2"></i>
+                              </div>
+                              <p class="m-0"> {{ data.status_message }} </p>
+                            </div>
+                            <div v-if="data.status === 'pending'" class="a_status_post a_color_code_grey">
+                              <div class="ic-warn-acc-con">
+                                <i class="fas fa-exclamation-circle font_15 p-1 pr-2"></i>
+                              </div>
+                              <p class="m-0"> {{ data.status_message }} </p>
+                            </div>
+                            <!-- /show status on post -->
+                            <a rel="nofollow" class="_flex_  ov_ad_card" href="javascript:void(0)" @click="show_notification(data.title, data.id, data.status === 'active' ? '' : data.status_message)">
+                              <div class="a_auto_pad_renew">
+                                <img :src="data.thumbnail ? data.thumbnail : empty_img_post" :alt="data.title" class="a_img_post_by bg_reload_img rounded-1" @error="imageUrlAlt_post">
+                              </div>
+                              <div class="pb-0 pl-3" :class="isDesktop ? 'pt-2' : 'pt-1'">
+                                <p class="m-0 pro_name my_truncate_wrap_signle_line fn_18 font_light_bold"> {{ data.title }} </p>
+                                <p v-if="data.price !== null" class="full_width truncate_wrap font_16 m-0 c_m_grey font_bold mar_top_list_post dt_pro_price">
+                                  <strong class="color_red me-1"> {{ 1 > parseInt(data.price) ? '$'+data.price : '$'+convert_price(data.price) }} </strong>
+                                  <span v-if="data.discount" class="pro_post_hour line_price"> ${{ convert_price(data.discount.original_price) }} </span>
+                                  <span v-if="data.discount" class="m-0 ms-1 font_11 text_buy"> {{ data.discount.type === 'percent' ? Number(data.discount.discount)+'% OFF' : '$'+Number(data.discount.discount)+' OFF' }} </span>
+                                </p>
+                                <div class="show_short_detail mb-1">
+                                  <dl>
+                                    <dt>ID:</dt>
+                                    <dd>{{ data.id }} &nbsp; &nbsp; </dd>
+                                    <template v-if="$device.isMobile">
+                                      <dt>{{ $t('message.view') }}:</dt>
+                                      <dd>{{ data.views ? data.views : '0' }}&nbsp; &nbsp;</dd>
+                                    </template>
+                                  </dl>
+                                  <dl>
+                                    <dt>{{ $t('new_text.post_date') }}:</dt>  
+                                    <dd> {{ data.posted_date ? formatDateWithTimeAgo(new Date(data.posted_date)) : '' }}&nbsp; &nbsp;</dd>
+                                    <template v-if="$device.isMobile === false">
+                                      <dt>{{ $t('new_text.renew_date') }}:</dt>
+                                      <dd> {{ data.renew_date ? formatDateWithTimeAgo(new Date(data.renew_date)) : ''}}</dd>
+                                    </template>
+                                  </dl>
+                                  <dl v-if="$device.isMobile" class="position-relative">
+                                    <dt>{{ $t('new_text.renew_date') }}:</dt>
+                                    <dd> {{ data.renew_date ? formatDateWithTimeAgo(new Date(data.renew_date)) : '' }}</dd>
+                                  </dl>
+                                  <dl class="position-relative">
+                                    <template v-if="$device.isMobile === false">
+                                      <dt>{{ $t('message.view') }}:</dt>
+                                      <dd>{{ data.views ? data.views : '0' }}&nbsp; &nbsp;</dd>
+                                    </template>
+                                    <dt>{{ $t('account_t.impression') }}:</dt>
+                                    <dd> {{ data.insights && data.insights.impression  ? data.insights.impression : 0 }} &nbsp; &nbsp;</dd>
+                                    <dt>{{ $t('account_t.engagement') }}:</dt>
+                                    <dd> {{ data.insights && data.insights.engagement ? data.insights.engagement : 0 }}</dd>
+                                  </dl>
+
+                                  <dl v-if="data.hasOwnProperty('availability') && data.availability == false">
+                                    <i class="unavailable_icon bi bi-ban text-danger"></i>
+                                    <dt>{{ $t('account_t.mark_un') }}</dt>  
+                                  </dl>
+
+
+                                </div>
+                              </div>
+                              <i v-if="data.shipping" class="fas fa-truck free_deliver ov_free_deliver"></i>
+                              <div v-if="data.is_premium && ['top', 'feature'].includes(data.premium.type)" class="position_absolute ad_card_type_premium_acc">
+                                <p class="m-0">{{ data.premium.title }}</p>
+                              </div>  
+                            </a>
+                            <!-- Ads Info -->
+                            <NuxtLink v-if="data.premium" @click="checkSubscription(data)" class="mb-2 d-flex justify-content-start align-items-center manage_ads_card_ad_info gap-1"  :class="isDesktop ? 'mx-2' : 'mx-1'">
+                              <div class="d-flex justify-content-center align-items-center">
+                                <div class="manage_ads_announcement_icon d-flex align-items-center justify-content-center">
+                                  <i class=" bi bi-megaphone fs-6"></i>
+                                </div>
+                            </div>
+                              <div class="pl-2 manage_ads_announcement_des">
+                                <p class="manage_ads_announcement_des_tile text-capitalize">{{ data.premium.title ? data.premium.title : ''}} . <span :class="[data.premium.status =='active' ? 'active' : '', data.premium.status =='pending' ? 'pending' : '', data.premium.status =='expired' ? 'expired' : '']">{{data.premium.status ? data.premium.status : ''}}</span></p>
+                                <p  class="manage_ads_announcement_des_date">{{ $t('account_t.last_change') }}: {{ forMatDate(data.premium.updated_at) }}</p>
+                                <p  class="manage_ads_announcement_des_date">{{ $t('account_t.valid_util') }}: {{ forMatDate(data.premium.end_date) }}</p>
+                              </div> 
+                              <div v-if="data.premium && data.premium.subscription_id" class="manage_ads_announcement_info_icon">
+                                <i class="bi bi-info-circle"></i>
+                              </div>      
+                            </NuxtLink>
+
+                            <!-- show set Auto Renew -->
+                            <div v-if="data.auto_renew" class="style_flex a_auto_renew_overwrite mx-1" :class="isDesktop ? 'mx-2' : ''">
+                              <div class="me-2"><i class="fas fa-history parent_color"></i></div>
+                              <div class="col p-0"><p class="m-0"> {{ $t('new_text.auto_renew') }} : {{ data.auto_renew.renew_hour }}:{{ data.auto_renew.renew_minute }} {{ data.auto_renew.renew_ampm }}</p></div>
+                              <div class="style_flex a_width_con_btn">
+                                <a rel="nofollow" aria-label="edit" @click="edit_auto_renew(data.id,data.auto_renew.renew_hour,data.auto_renew.renew_minute,data.auto_renew.renew_ampm)" class="col text-center p-0 cl_ripple" href="javascript:void (0)">
+                                  <i class="fas fa-pencil-alt a_mr_icon_cover"></i>
+                                </a>
+                                <a rel="nofollow" aria-label="remove" @click="remove_auto_renew(data.id)" class="col text-center p-0 cl_ripple" href="javascript:void (0)">
+                                  <i class="fas fa-minus-circle a_mr_icon_cover text-danger"></i>
+                                </a>
+                              </div>
+                            </div>
+                            <!-- Actions Ads -->
+                            <div v-if="data.actions && data.actions.length">
+                              <div v-if="data.status === 'block'" class="action_posts p-1 d-flex justify-content-lg-between gap-1">
+                                <button v-if="data.actions && data.actions.includes('delete')" @click="actionModal('delete',data)" type="button" class="bg-white flex-grow-1 border-0 outline-none rounded-1">{{ $t('message.delete') }}</button>
+                              </div>
+                              <div v-else class="action_posts p-1 d-flex justify-content-lg-between gap-1" :class="isDesktop ? 'mx-1' : ''" >     
+                                <button v-if="!data.auto_renew" :disabled="renew_btn_disable(data.renew_date)" @click="renewAd(data)" type="button" :id="data.id" class="bg-white flex-grow-1 border-0 outline-none rounded-1" :class="renew_btn_disable(data.renew_date) ? 'disable_text' : ''" >{{ $t('account_t.renew') }}</button>
+                                <button v-if="data.actions && data.actions.includes('promote')" type="button" class="bg-white  flex-grow-1 border-0 outline-none rounded-1" @click="promote(data)">{{ $t('account_t.promote') }}</button>
+                                <button @click="share(data), dataShareModal = data "  type="button" class="bg-white flex-grow-1 border-0 outline-none rounded-1">{{ $t('account_t.share') }}</button>
+                                <button v-if="data.actions.filter(action => action !== 'view' && action !== 'share').length > 0" @click="show_modal_option(data, data.id, data.total_job_application ? data.total_job_application : '', data.title ? data.title : '')" class="show_more_action_ad rounded-1">
+                                  <i class="icon-ellipsis-vertical action_option_custom_bi"></i>
+                                  <span v-if="data.total_job_application && data.total_job_application > 0" class="badge bg-danger post-badge-apply-job">{{ data.total_job_application }}</span>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                  
+                        </div>
+                      </div>
+                    </div>
+                  </template>
+                  <template v-if="!isDesktop">
+                    <ClientOnly>
+                      <VueEternalLoading :load="get_active_post" v-model:is-initial="isInitial" :key="key_initial" v-if="key_initial > 1" margin="800px">
+                        <template #loading>
+                          <div style="width: 100%;padding: 0;">
+                            <!-- loading when data have -->
+                            <div v-if="posts.length > 0" class="text-center mt-4">
+                              <img :src="asset_url+version_library+'img/newLoading.gif'" alt="Loading..." class="loading_width">
+                            </div>
+                            <!-- loading when data empty -->
+                            <div v-else class="full_width mt-2">
+                              <div v-for="s in 3" :key="s" class="col-12 no_padding">
+                                <div class="pad_list_">
+                                  <div class="my_card padding_my_card">
+                                    <div class="_flex_">
+                                      <div class="animated-background load-width-scroll"></div>
+                                      <div class="pb-0 pt-1 pl-2 full_width">
+                                        <div class="animated-background mb-2 text_hei_loading_title"></div>
+                                        <div class="animated-background mb-2 text_hei_loading_price width_50"></div>
+                                        <div class="_flex_">
+                                          <div class="col-5 animated-background mb-2 me-1 p-0 text_hei_loading"></div>
+                                          <div class="col-5 animated-background mb-2 ms-1 p-0 text_hei_loading"></div>
+                                        </div>
+                                        <div class="animated-background mb-2 text_hei_loading"></div>
+                                        <div class="animated-background text_hei_loading"></div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </template>
+                        <template #error="{ retry }">
+                          <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no_padding">
+                            <div class="no_more_result p-2">
+                              <div class="p_bg_status">
+                                <span class="fas fa-wifi size_icon_status"></span>
+                                <p class="mt-4 font_bold font_21 mb-1"> {{ $t('error_connect.title_error_con') }} </p>
+                                <p class="font_16 pt-2 pb-2 pl-3 pr-3 m-0"> {{ $t('error_connect.body_error_con') }} </p>
+                                <button type="button" @click="retry" class="btn bg_btn_status"> {{ $t('error_connect.retry') }} </button>
+                              </div>
+                            </div>
+                          </div>
+                        </template>
+                        <template #no-more>
+                          <div class="no_more_result mt-4 mb-2">{{ $t('message.no_more_result') }}</div>
+                        </template>
+                        <template #no-results>
+                          <div class="no_more_result" :class="isMobile ? 'n-m-r-mg' : 'border py-5 bg-white rounded-2'">
+                            <template v-if="route.query && route.query.check_tap">
+                              <img src="/icon/empty-box.png" alt="empty-box.png" width="110px">
+                              <p class="no_more_result mt-2">{{ $t('account_t.message_not_active_post') }}</p>
+                            </template>
+                            <template v-else>
+                              <i class="icon-camera u_no_result_font"></i>
+                              <p class="no_more_result mt-2"> {{ $t('new_text_3.empty_ads') }} </p>
+                              <NuxtLink :to="localePath({ name: 'post' })" class="btn fns-17 btn-k24-secondary custom_btn_ empty_btn_alert">
+                                {{ $t('new_text_3.sell_your_staff') }}
+                              </NuxtLink>
+                              <br><br><br>
+                            </template>
+                          </div>
+                        </template>
+                      </VueEternalLoading>
+                    </ClientOnly>
+                    <br><br><br>
+                  </template>
+                  <template v-else>
+                    <div v-if="dt_ac_loading" class="width_100 text-center mt-4FC" ref="targets">
+                      <div v-if="posts.length > 0" class="text-center mt-4 mb-4">
+                        <img :src="asset_url+version_library+'img/newLoading.gif'" alt="Loading..." class="loading_width">
+                      </div>
+                      <div v-else class="full_width mt-2">
+                        <div v-for="s in 3" :key="s" class="col-12 no_padding">
+                          <div class="pad_list_">
+                            <div class="my_card padding_my_card">
+                              <div class="_flex_">
+                                <div class="animated-background load-width-scroll"></div>
+                                <div class="pb-0 pt-1 pl-2 full_width">
+                                  <div class="animated-background mb-2 text_hei_loading_title"></div>
+                                  <div class="animated-background mb-2 text_hei_loading_price width_50"></div>
+                                  <div class="_flex_">
+                                    <div class="col-5 animated-background mb-2 me-1 p-0 text_hei_loading"></div>
+                                    <div class="col-5 animated-background mb-2 ms-1 p-0 text_hei_loading"></div>
+                                  </div>
+                                  <div class="animated-background mb-2 text_hei_loading"></div>
+                                  <div class="animated-background text_hei_loading"></div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div v-else class="des_btn_load_more">
+                      <button v-if="ac_hide_btn_load_more" @click="manually_get_active_post" class="btn">{{ $t('text_desktop.load_more') }}</button>
+                      <div v-else-if="posts.length === 0" class="no_more_result n-m-r-mg text-center width_100">
+                        <i class="fa fa-exclamation-circle u_no_result_font"></i>
+                        <p class="no_more_result mt-2">{{ $t('message.no_result') }}</p>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+                <!------- Tap show expired ------->
+                <div :class="tap_active_or_expire === 'expired' ? 'tab-pane fade show active' : 'tab-pane fade show'" id="pills_expired" role="tabpanel" aria-labelledby="expired_tap">
+                  <template v-if="expired_posts">
+                    <div v-for="exp_data in expired_posts" :key="exp_data"  class="_flex_" :id="'item_'+exp_data.id" :class="!isMobile ? 'mb-1' : 'mt-2'">
+                      <div class="col-12 no_padding">
+                        <div :class="isMobile ? 'pad_list_' : 'pt-2'">
+                          <div class="my_card padding_my_card">
+
+                        <!-- show status on post -->
+                        <div v-if="exp_data.status === 'expired'" class="a_status_re_post">
+                          <div class="ic-warn-acc-con">
+                            <i class="fas fa-exclamation-circle a_margin_icon font_15"></i>
+                          </div>
+                          <p class="m-0">{{ exp_data.status_message }}</p>
+                        </div>
+                        <div v-else-if="exp_data.status === 'block'" class="a_status_post a_color_code_red">
+                          <div class="ic-warn-acc-con">
+                            <i class="fas fa-exclamation-circle font_15 p-1 pr-2"></i>
+                          </div>
+                          <p class="m-0"> {{ exp_data.status_message }} </p>
+                        </div>
+                        <!-- /show status on post -->
+                        <!-- is block -->
+                        <a rel="nofollow" v-if="exp_data.status === 'block'" href="javascript:void(0)" @click="click_show_block(exp_data.status_message)" class="_flex_">
+                          <div style="padding: 6px;">
+                            <img :src="exp_data.thumbnail ? exp_data.thumbnail : empty_img_post" class="a_img_post_by bg_reload_img" @error="imageUrlAlt_post">
+                          </div>
+                          <div class="pb-0 pt-1 pl-2">
+                            <p class="m-0 pro_name a_truncate_wrap font_14 font_light_bold dt_pro_name"> {{ exp_data.title }}</p>
+                            <p v-if="parseInt(exp_data.price) > 0" class="color_red full_width m-0 font_16 mar_top_list_post dt_pro_price">
+                              {{ 1 > parseInt(exp_data.price) ? '$'+exp_data.price : '$'+convert_price(exp_data.price) }}
+                            </p>
+                            <div class="show_short_detail mb-1">
+                              <dl>
+                                <dt>ID :</dt>
+                                <dd> {{ exp_data.id }} &nbsp;&nbsp;&nbsp; </dd>
+                                <dt>{{ $t('message.view') }} :</dt>
+                                <dd> {{ exp_data.views ? exp_data.views : '0' }} </dd>
+                              </dl>
+                              <dl>
+                                <dt>{{ $t('new_text.post_date') }} : </dt>
+                                <dd> {{ exp_data.posted_date ? convertFromNow(exp_data.posted_date, '') : '' }}</dd>
+                              </dl>
+                              <dl>
+                                <dt>{{ $t('new_text.renew_date') }} : </dt>
+                                <dd> {{ exp_data.renew_date ? convertFromNow(exp_data.renew_date, 'ago') : '' }}</dd>
+                              </dl>
+                            </div>
+                          </div>
+                        </a>
+                        <!-- click show detail if not block -->
+                        <a rel="nofollow" v-else href="javascript:void(0)" @click="show_detail(exp_data.title, exp_data.id)" class="_flex_">
+                          <div style="padding: 6px;">
+                            <img :src="exp_data.thumbnail ? exp_data.thumbnail : empty_img_post" class="a_img_post_by bg_reload_img" @error="imageUrlAlt_post">
+                          </div>
+                          <div class="pb-0 pt-1 pl-2">
+                            <p class="m-0 pro_name a_truncate_wrap font_14 font_light_bold dt_pro_name"> {{ exp_data.title }}</p>
+                            <p class="color_red full_width m-0 font_16 mar_top_list_post dt_pro_price">
+                              {{ 1 > parseInt(exp_data.price) ? '$'+exp_data.price : '$'+convert_price(exp_data.price) }}
+                            </p>
+                            <div class="show_short_detail mb-1">
+                              <dl>
+                                <dt>ID :</dt>
+                                <dd> {{ exp_data.id }} &nbsp;&nbsp;&nbsp; </dd>
+                                <dt>{{ $t('message.view') }} :</dt>
+                                <dd> {{ exp_data.views ? exp_data.views : '0' }} </dd>
+                              </dl>
+                              <dl>
+                                <dt>{{ $t('new_text.post_date') }} : </dt>
+                                <dd> {{ exp_data.posted_date ? formatDateWithTimeAgo(new Date(exp_data.renew_date)) : ''}}</dd>
+                              </dl>
+                              <dl>
+                                <dt>{{ $t('new_text.renew_date') }} : </dt>
+                                <dd> {{ exp_data.renew_date ? formatDateWithTimeAgo(new Date(exp_data.renew_date)) : '' }}</dd>
+                              </dl>
+                            </div>
+                          </div>
+                        </a>
+
+                        <div class="style_flex mt-1 a_border_t_of_post">
+
+                          <!-- Re-post -->
+                          <div v-if="exp_data.status === 'block'" class="col a_section_click color_disable"><p>{{ $t('new_text.re_post') }}</p></div>
+                          <NuxtLink v-else :to="localePath({ name: 'post-id', params: { id: exp_data.id }, query: { from: 'account_expired_ads', type: 'expired' } })" class="col cur_sur a_section_click">
+                            <p>{{ $t('new_text.re_post') }}</p>
+                          </NuxtLink>
+
+                          <!-- Delete -->
+                          <div @click="show_modal_delete(exp_data.id, '', 'expired')" class="col cur_sur a_section_click">
+                            <p>{{ $t('message.delete') }}</p>
+                          </div>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+
+              <template v-if="!isDesktop">
+                <ClientOnly>
+                  <VueEternalLoading :load="get_expired_post" v-model:is-initial="isInitial" :key="key_initial" v-if="key_initial > 1" margin="800px">
+                    <template #loading>
+                      <div style="width: 100%;padding: 0;">
+                        <!-- loading when data have -->
+                        <div v-if="expired_posts.length > 0" class="text-center mt-4">
+                          <img :src="asset_url+version_library+'img/newLoading.gif'" alt="laoding" class="loading_width">
+                        </div>
+                        <!-- loading when data empty -->
+                        <div v-else class="full_width mt-2">
+                          <div v-for="s in 3" :key="s" class="col-12 no_padding">
+                            <div class="categories_padding">
+                              <div class="my_card padding_my_card">
+                                <div class="_flex_">
+                                  <div class="animated-background load-width-scroll"></div>
+                                  <div class="pb-0 pt-1 pl-2 full_width">
+                                    <div class="animated-background mb-2 text_hei_loading_title"></div>
+                                    <div class="animated-background mb-2 text_hei_loading_price width_50"></div>
+                                    <div class="_flex_">
+                                      <div class="col-5 animated-background mb-2 me-1 p-0 text_hei_loading"></div>
+                                      <div class="col-5 animated-background mb-2 ms-1 p-0 text_hei_loading"></div>
+                                    </div>
+                                    <div class="animated-background mb-2 text_hei_loading"></div>
+                                    <div class="animated-background text_hei_loading"></div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+                    <template #error="{ retry }">
+                      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no_padding">
+                        <div class="no_more_result p-2">
+                          <div class="p_bg_status">
+                            <span class="fas fa-wifi size_icon_status"></span>
+                            <p class="mt-4 font_bold font_21 mb-1"> {{ $t('error_connect.title_error_con') }} </p>
+                            <p class="font_16 pt-2 pb-2 pl-3 pr-3 m-0"> {{ $t('error_connect.body_error_con') }} </p>
+                            <button type="button" @click="retry" class="btn bg_btn_status"> {{ $t('error_connect.retry') }} </button>
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+                    <template #no-more>
+                      <div class="no_more_result mt-4">{{ $t('message.no_more_result') }}</div>
+                    </template>
+                    <template #no-results>
+                      <div class="no_more_result" :class="isMobile ? 'n-m-r-mg' : 'border py-5 bg-white rounded-2'">
+                        <!-- <i class="fa fa-exclamation-circle u_no_result_font"></i>
+                        <p class="no_more_result mt-2"> {{ $t('message.no_result') }} </p> -->
+                        <img src="/icon/empty-box.png" alt="empty-box.png" width="110px">
+                        <p class="no_more_result mt-2">{{ $t('account_t.message_not_expired_post') }}</p>
+                      </div>
+                    </template>
+                  </VueEternalLoading>
+                </ClientOnly>
+                <br><br><br>
+              </template>
+              <template v-else>
+                <div v-if="dt_expi_loading" class="width_100 text-center mt-4" ref="targets">
+                  <div v-if="expired_posts.length > 0" class="text-center mt-4 mb-4">
+                    <img :src="asset_url+version_library+'img/newLoading.gif'" alt="Loading..." class="loading_width">
+                  </div>
+                  <div v-else class="full_width mt-2">
+                    <div v-for="s in 3" :key="s" class="col-12 no_padding">
+                      <div class="pad_list_">
+                        <div class="my_card padding_my_card">
+                          <div class="_flex_">
+                            <div class="animated-background load-width-scroll"></div>
+                            <div class="pb-0 pt-1 pl-2 full_width">
+                              <div class="animated-background mb-2 text_hei_loading_title"></div>
+                              <div class="animated-background mb-2 text_hei_loading_price width_50"></div>
+                              <div class="_flex_">
+                                <div class="col-5 animated-background mb-2 me-1 p-0 text_hei_loading"></div>
+                                <div class="col-5 animated-background mb-2 ms-1 p-0 text_hei_loading"></div>
+                              </div>
+                              <div class="animated-background mb-2 text_hei_loading"></div>
+                              <div class="animated-background text_hei_loading"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div v-else class="des_btn_load_more">
+                  <button v-if="expi_hide_btn_load_more" @click="manually_get_expired_post" class="btn">{{ $t('text_desktop.load_more') }}</button>
+                  <div v-else-if="expired_posts.length === 0" class="no_more_result n-m-r-mg text-center width_100">
+                    <i class="fa fa-exclamation-circle u_no_result_font"></i>
+                    <p class="no_more_result mt-2">{{ $t('message.no_result') }}</p>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
-
+    <div v-if="loading_field" class="loading_back_ground">
+      <div class="loading_img">
+        <img :src="asset_url+version_library+'img/newLoading.gif'" alt="Loading" class="loading_width loading_bg">
+      </div>
     </div>
 
+    <div class="loading_back_ground d-none" id="open_or_close_loading_field">
+      <div class="loading_img">
+        <img :src="asset_url+version_library+'img/newLoading.gif'" alt="Loading" class="loading_width loading_bg">
+      </div>
+    </div>
+
+    <!-- show success message -->
+    <div class="toast style_toast d-none acc_toast toast_z_index overwrite_toast_manage_post">
+      <div class="toast-header header_padding_toast">
+        <strong class="me-auto style_flex">
+          <i v-if="error_or_success_message" class="fas fa-check-circle text-success font_22"></i>
+          <i v-else class="fas fa-exclamation-circle text-danger font_22"></i>
+          <p class="m-0 ms-2"> {{ message_success ? message_success : $t('new_text.status_renew') }} </p>
+        </strong>
+        <button type="button" class="close overwrite_clost_toast_manage_post_btn" data-bs-dismiss="toast" aria-label="Close">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+    </div>
+    <!-- /show success message -->
+
+    <!-- Modal show change or view profile picture -->
+    <div class="modal fade " :class="isMobile ? 'style_full_screen' : ''" id="modal_change_image" tabindex="-1" role="dialog">
+      <div class="modal-dialog bg-modal" :class="isMobile ? 'modal_dialog_style' : 'modal-dialog-centered m-auto top_60 pos_static'" role="document">
+        <div class="modal-content" :class="isMobile ? 'animate-bottom' : 'rounded'">
+          <div :class="isMobile ? 'modal_bottom_screen' : ''">
+            <div class="option_selected">
+              <div class="modal-body p-0">
+                <ul class="list-unstyled mobile_modal_actions_container">
+                  <li @click="view_or_change('view')" class="color_reason mobile_modal_action cur_sur">
+                    <a rel="nofollow" class="m-auto text-primary"> {{ $t('message.the_view') }} </a>
+                  </li>
+                  <li @click="view_or_change('change')" class="color_reason mobile_modal_action cur_sur">
+                    <a rel="nofollow" class="m-auto text-primary"> {{ $t('message.change') }} </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <!-- <div class="a_cancel_btn_modal_bg">
+              <div class="cl_ripple a_cancel_btn_modal cur_sur" data-bs-dismiss="modal" aria-label="Close">
+                <p class="modal-title color_reason"><b> {{ $t('message.cancel') }} </b></p>
+              </div>
+            </div> -->
+            <button data-bs-dismiss="modal" class="mobile_modal_cancel_button text-danger">{{ $t(`message.cancel`) }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Modal show change or view profile picture -->
+
+    <!-- Modal show delete reason post -->
+    <div class="modal fade" :class="isMobile ? 'style_full_screen': ''" id="modal_show_delete_reason" tabindex="-1" role="dialog">
+      <div class="modal-dialog" :class="isMobile ? ' modal_dialog_style' : 'modal-dialog-centered m-auto m_w'" role="document">
+        <div class="modal-content" :class="isMobile ? 'animate-bottom' : 'rounded'">
+          <div :class="isMobile ? 's_content' : 'dt_modal_width'">
+            <div class="border_bottom m-r-p-pad">
+              <p class="modal-title font_15"> {{ $t('lng.delete_reason') }} </p>
+            </div>
+            <div class="modal-body p-0" :class="isMobile ? 'overflow_content' : ''">
+              <ul class="list-unstyled bg-white">
+                <li @click="choose_delete(re.value)" v-for="re in delete_post.data" :key="re" class="full_field_tag cur_sur">
+                  {{ language === 'km' ? re.km : re.en }}
+                  <i v-if="re.value === delete_check" class="fas fa-check color_sub_icon mt-1 float-right c_orange"></i>
+                </li>
+              </ul>
+              <div v-if="show_description" class="u_rep_pad_sub">
+                <textarea v-model="delete_description" rows="4" id="delete_description" :placeholder="$t('new_text_1.description')" class="form-control"></textarea>
+                <label id="error_delete_description" class="text-danger font_14 ms-2 d-none">{{ $t('validation.error_description') }}</label>
+              </div>
+            </div>
+            <!-- button submit report -->
+            <div class="p-2 text-center _flex_ border-top">
+              <div @click="close_delete_modal" class="col-4 p-0 cur_sur">
+                <p class="font_16 modal-title p-2 bg_grey me-2 rounded cur_sur"> {{ $t('message.cancel') }} </p>
+              </div>
+              <div @click="click_delete_ads" class="col-8 p-0 cur_sur">
+                <p class="font_16 modal-title p-2 bg_orange text-white rounded cur_sur"> {{ $t('message.delete') }} </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Modal show delete reason post -->
+
+    <!-- Modal show error connection -->
+    <div class="modal class_modal_show_status_connection" id="modal_show_status_error_connection" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal_dialog_style mg-mo-auto" role="document" >
+        <div class="modal-content max_width_form">
+          <div class="modal-body break_word_ show_text_status b-s-h-con">
+            <p class="title_error_connect_">{{ $t('error_connect.title_error_con') }}</p>
+            <p class="body_error_connect_">{{ $t('error_connect.body_error_con') }}</p>
+          </div>
+          <div class="modal-footer u_safety_footer">
+            <button type="button" data-bs-dismiss="modal" class="btn text-primary"> {{ $t('message.close') }} </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Modal show error connection -->
+
+    <!-- Modal show set auto renew -->
+
+    <!-- <div class="modal fade" :class="isMobile ? 'style_full_screen' : ''" id="modal_set_auto_renew" tabindex="-1" role="dialog">
+      <div class="modal-dialog" :class="isMobile ? 'modal_dialog_style' : 'modal-dialog-centered m-auto m_w'" role="document">
+        <div class="modal-content" :class="isMobile ? 'animate-bottom' : 'rounded'">
+          <div :class="isMobile ? 'modal_bottom_screen' : 'dt_modal_width'">
+            <div class="option_selected">
+              <div class="modal-body p-0">
+                <ul class="list-unstyled list-phone-modal">
+                  <li @click="set_auto_renew" class="color_reason cl_ripple cur_sur">
+                    <a rel="nofollow" class="full_field_a_tag border_unset"> {{ $t('new_text.set_auto_renew') }}  </a>
+                  </li>
+                  <li v-if="post_job_unread > 0" class="color_reason cl_ripple cur_sur border_top">
+                    <a rel="nofollow" @click="show_jobs_unread" class="full_field_a_tag border_unset">
+                      {{ $t('new_text.job_application') }} {{ '( '+post_job_unread+' )' }}
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="a_cancel_btn_modal_bg">
+              <div class="cl_ripple a_cancel_btn_modal cur_sur" data-bs-dismiss="modal" aria-label="Close">
+                <p class="modal-title color_reason"><b> {{ $t('message.cancel') }} </b></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> -->
+    
+    <!----------------------------------------------->
+    <div class="modal class_modal_show_message" id="modal_choose_time_picker" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal_dialog_style max_width_ mg_center from_top" role="document">
+        <div class="modal-content max_width_form">
+          <div class="modal-body break_word_ show_text_status p-3">
+            <b> {{ $t('new_text.set_auto_renew') }} </b> <br>
+
+            <div class="row">
+              <!-- select hour -->
+              <div class="col">
+                <select class="form-control" v-model="renew_hours">
+                  <option v-for="in_hour in arr_hour" :key="in_hour" :value="in_hour"> {{ in_hour }} </option>
+                </select>
+              </div>
+              <!-- select minute -->
+              <div class="col">
+                <select class="form-control" v-model="renew_minute">
+                  <option v-for="in_hour in arr_minute" :key="in_hour" :value="in_hour"> {{ in_hour }} </option>
+                </select>
+              </div>
+              <!-- select am or pm -->
+              <div class="col">
+                <select class="form-control" v-model="renew_am_or_pm">
+                  <option value="am">AM</option>
+                  <option value="pm">PM</option>
+                </select>
+              </div>
+            </div>
+
+          </div>
+          <div class="modal-footer u_safety_footer">
+            <button type="button" data-bs-dismiss="modal" class="btn"> {{ $t('message.cancel') }} </button>
+            <button type="button" @click="click_save_auto_renew" class="btn parent_color"> {{ $t('new_text.save') }} </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /Modal show set auto renew -->
+
+    <!-- alert show error message -->
+    <div class="modal fade class_modal_show_message" id="modal_show_error" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal_dialog_style max_width_ mg_center from_top" role="document">
+        <div class="modal-content max_width_form">
+          <div class="modal-body break_word_ show_text_status p-3"> {{ show_error_message }} </div>
+          <div class="modal-footer u_safety_footer">
+            <button type="button" data-bs-dismiss="modal" class="btn text-primary"> {{ $t('message.close') }} </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /alert show error message -->
+
+    <!-- alert show option share media -->
+    <div class="modal fade t-0 b-0" id="modal_show_option_share_test" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal_dialog_style max_width_ mg_center class_modal_show_status" role="document">
+        <div class="modal-content max_width_form">
+
+          <div class="option_selected">
+            <div class="text-center border_bottom m-r-p-sm-pad">
+              <p id="label_phone_or_sms" class="modal-title font_19">{{ $t('new_text.share') }}</p>
+            </div>
+            <ul id="list-phone-modal" class="list-unstyled list-phone-modal">
+              <li @click="facebook_sharing" class="cl_ripple">
+                <div class="cur_sur full_field_a_tag color_reason _flex_">
+                  <div class="col _flex_ p-0 mt-1">
+                    <img :src="asset_url+version_library+'img/face_book_logo.svg'" alt="facebook" class="img_share_option_p_n">
+                    <p class="img_share_option_color">Facebook</p>
+                  </div>
+                </div>
+              </li>
+              <li @click="twitter_sharing" class="cl_ripple">
+                <div class="cur_sur full_field_a_tag color_reason">
+                  <div class="col _flex_ p-0 mt-1">
+                    <img :src="asset_url+version_library+'img/share_twitter.svg'" alt="twitter" class="img_share_option_p_n">
+                    <p class="img_share_option_color">Twitter</p>
+                  </div>
+                </div>
+              </li>
+              <li @click="copy_link(profile.link)" class="cl_ripple">
+                <div class="cur_sur full_field_a_tag color_reason">
+                  <div class="col _flex_ p-0 mt-1">
+                    <img :src="asset_url+version_library+'img/share_link.svg'" alt="copy link" class="img_share_option_p_n">
+                    <p class="img_share_option_color">{{ $t('new_text_1.link') }}</p>
+                    <div class="h-c-parent">
+                      <input id="copy_link" v-on:focus="$event.target.select()" ref="clickLink" readonly :value="config.VUE_APP_BASE_URL+profile.username" class="hide_copy_text"/>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="modal-footer u_safety_footer">
+              <button type="button" data-bs-dismiss="modal" class="btn text-primary font_18"> {{ $t('message.close') }} </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <!-- /alert show option share media -->
+
+    <!-- remove auto renew -->
+    <div class="modal class_modal_show_message" id="modal_confirm_remove_auto_renew" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal_dialog_style max_width_ mg_center from_top" role="document">
+            <div class="modal-content max_width_form">
+                <div class="modal-body break_word_ show_text_status p-3"> {{ $t('new_text.remove_auto_renew') }} </div>
+                <div class="modal-footer u_safety_footer">
+                    <button type="button" @click="click_remove_auto_renew()" class="btn text-primary text-danger"> {{ $t('new_text.remove') }} </button>
+                    <button type="button" data-bs-dismiss="modal" class="btn text-primary"> {{ $t('message.cancel') }} </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- modal categories -->
+    <Modal_listing_categories :get_category_by_user="category_by_user" v-if="profile && profile.member_type != 1" />
+    <!-- /modal categories -->
+
+    <!-- Actions Ad Modal -->
+    <div class="modal fade" id="actionModal" tabindex="-1" aria-labelledby="actionModalLabel" aria-modal="true" role="dialog">
+      <div class="modal-dialog" :class="mobileDevice ? 'ov_mobile_modal modal-fullscreen': 'modal-dialog-centered mx-auto'"> 
+        <div class="modal-content p-2" :class="!mobileDevice ? 'bg-transparent': 'overwrite_model_content'">
+          <div v-if="dataAdAction && dataAdAction.actions && dataAdAction.actions.length" class="mobile_modal_actions_container">
+            <button type="button" @click="actionModal(a, dataAdAction)" :key="a" v-for="a in dataAdAction.actions.filter(v => !(['view', 'share', 'renew', 'promote']).includes(v))" class="mobile_modal_action text-primary"> 
+                <i v-if="a=='edit'" class="bi bi-pencil-square icon"></i>
+                <i v-if="a=='delete'" class="bi bi-trash icon"></i>
+                <i v-if="a=='auto_renew'" class="bi-arrow-clockwise transform_scale icon"></i>
+                <i v-if="a=='insights'" class="bi bi-globe-americas icon"></i>
+                <i v-if="a=='availability' &&  dataAdAction.availability" class="bi bi-ban icon"></i>
+                <i v-if="a=='availability' &&  !dataAdAction.availability" class="bi bi-check-circle icon"></i>
+                <i v-if="a=='paid_ads'" class="bi bi-arrow-repeat custom_bi icon"></i>
+                {{ a.toLowerCase() =='availability' ? ( dataAdAction.availability ? $t(`account_t.mark_un`) : $t(`account_t.mark_av`) ) : ''}}
+                {{ a.toLowerCase() !='availability' ? $t(`account_t.${a}`) : ''}}
+            </button>
+            <button v-if="dataAdAction.total_job_application > 0" class="mobile_modal_action text-primary" @click="router.push(localePath({ name: 'account-job-applications', query:{ post_id: dataAdAction.id ,title: dataAdAction.title }}))">
+              <i class="bi bi-clipboard2 icons"></i>
+              <div>{{ $t('new_text.job_application') }}</div>
+              (<span class="text-danger"> {{ dataAdAction.total_job_application }} </span>)
+            </button>
+          </div>
+          <button type="button" data-bs-dismiss="modal" class="mobile_modal_cancel_button text-primary">{{ $t(`account_t.cancel`) }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Ad Modal -->
+    <div class="modal fade" id="deleteAdModal" aria-hidden="true" aria-labelledby="deleteAdModalLabel" tabindex="-1">
+      <div class="modal-dialog" :class="mobileDevice ? 'ov_delete_mobile_modal modal-fullscreen ': 'modal-dialog-centered mx-auto'">
+        <div class="ov_delete_mobile_modal modal-content" :class="mobileDevice ? 'ov_delete_mobile_modal pb-2': 'ov_delete_desktop_modal'">
+          <div :class="mobileDevice ? 'delete_modal_actions_container': 'delete_modal_actions_container_desktop'">
+            
+            <div class="mb-0 delete_reason_modal_bar d-flex text-center" :class="!mobileDevice ? 'bg-white text-dark py-3 postion-relative' : 'delete_reason_modal_bar_height position-absolute'">{{ $t('lng.delete_reason') }}</div>
+            
+            <div class="delete_reason_title_wrapper" :class="mobileDevice ? 'delete_reason_title_wrapper_mobile' : ''" >
+              <li class="delete_reason_title" :key="r" v-for="r in deleteReasons" @click="deleteForm.reason = r.value , (deleteForm.reason != 'other' ? (typeing= false, deleteForm.description = '') : '')" ><span>{{ locale == 'en' ? r.en : r.km }}</span><span v-if="r.value == deleteForm.reason" class="delete_reasone_slect_icon"><i class="bi bi-check2-circle"></i></span></li>
+                <div v-if="deleteForm.reason == 'other'" class="px-3 mt-3 position-relative">
+                    <label class="text-secondary" for="deleteReasone">{{ $t('account_t.reason') }}:</label>
+                    <input :class="deleteForm.description.length < 10 ? 'error_border_field' : ''" class="delete_reason_input" type="text" id="deleteReasone" name="deleteReasone" @input="checkExist($event)" v-model="deleteForm.description" :placeholder="locale == 'en' ? 'Please write down your description here...' : 'សូមសរសេរការពិពណ៌នារបស់អ្នកនៅទីនេះ...'"  @keyup.enter="submitDeleteReason('#deleteAdModal')" />
+                    <span v-if="!deleteForm.description.length" class="error_delete_field"><i class="bi bi-exclamation-circle"></i><span class="error_field_description"> {{ $t('validation.error_description') }}</span></span>
+                    <span v-if="deleteForm.description.length && ( deleteForm.description.length < 10 || deleteForm.description.length > 255 )" class="error_delete_field"><i class="bi bi-exclamation-circle"></i><span class="error_field_description">{{ locale == 'en' ? 'The description field must be between 10 and 255 characters.' : 'ការពិពណ៌នាត្រូវតែចន្លោះ ១០​ ទៅ ២៥៥ តួអក្សរ។'}} </span></span>
+                </div>
+              </div>
+            <div :class="mobileDevice ? 'test_mobile_delete_button_wrapper' : 'desktop_delete_button_wrapper px-3 mt-5 gap-2'">
+              <button @click="resetDeleteForm" data-bs-dismiss="modal" class="btn form-control-lg btn-xm billind_add_cancel_btn w-25 _light_border"><span>{{ $t('account_t.cancel') }}</span></button>
+              <button @click="submitDeleteReason('#deleteAdModal')" class="w-75 btn form-control-lg btn-xm btn-k24-secondary"><span>{{ $t('account_t.delete') }}</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Share Modal Desktop -->
+    <div class="modal fade t-0 b-0" id="modal_show_option_share"  tabindex="-1" role="dialog">
+        <div class="modal-dialog bg-modal" :class="isMobile ? 'modal_dialog_style' : 'modal-dialog-centered m-auto top_60 pos_static'" role="document">
+            <div class="modal-content" :class="isMobile ? 'max_width_form s_content p-3 bg-modal' : 'rounded'">
+                <div class="option_selected">
+                    <div class="text-center border_bottom m-r-p-sm-pad">
+                        <p class="modal-title font_19">{{ $t('new_text.share') }}</p>
+                    </div>
+                    <ul class="list-unstyled mobile_modal_actions_container mb-0">
+                        <li @click="sharePostTofacebook()" class="mobile_modal_action py-2">
+                            <div class="cur_sur color_reason _flex_">
+                                <div class="col _flex_ p-0">
+                                    <img :src="asset_url+version_library+'img/face_book_logo.svg'" alt="facebook" class="img_share_option_p_n">
+                                    <p class="img_share_option_color">Facebook</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li @click="sharePostToTwitter()"  class="mobile_modal_action py-2">
+                            <div class="cur_sur color_reason">
+                                <div class="col _flex_ p-0">
+                                    <img :src="asset_url+version_library+'img/share_twitter.svg'" alt="twitter" class="img_share_option_p_n">
+                                    <p class="img_share_option_color">Twitter</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li @click=copyPostURL(dataShareModal.link) class="mobile_modal_action py-2">
+                            <div class="cur_sur color_reason">
+                                <div class="col _flex_ p-0">
+                                    <img :src="asset_url+version_library+'img/share_link.svg'" alt="copy link" class="img_share_option_p_n">
+                                    <p class="img_share_option_color">{{ $t('new_text_1.link') }}</p>
+                                    <div class="h-c-parent">
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="mt-3">
+                    <button data-bs-dismiss="modal" class="mobile_modal_cancel_button">{{ $t(`account_t.cancel`) }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Ads Modal -->
+    <div class="modal fade" id="myChangeAdsModal" tabindex="-1" aria-labelledby="myChangeAdsModalLabel" aria-hidden="true">
+      <div class="modal-dialog m-0" :class="!mobileDevice ? 'modal-dialog-centered mx-auto mt-3' : 'modal-fullscreen'">
+        <div id="myadsContent" class="modal-content" :class="!mobileDevice ? 'mobile_content_adsmodal_desktop' : 'mobile_content_adsmodal_mobile'" >
+          <div class="mobile_content_adsmodal_navbar">
+            <button data-bs-dismiss="modal"  class="mobile_content_adsmodal_navbar_icon"><i class="bi bi-chevron-down custom_bi"></i></button>
+            <span class="mobile_content_adsmodal_navbar_title">{{ $t('new_text_1.my_ads') }}</span>
+          </div>
+          <div class="modal-body modal-body-adsmodal overflow-y-scroll p-2">
+            <div @click="changePaidAdFormData.adid = item.id, navigateMyAdModalContent('#myadsContent'), changeAdSelected = item" :key="item" v-for="item in myAd" class="modal-body_ads_item"> 
+              <div class="modal-body_ads_item_thumnail">
+                <img :src="item.thumbnail ? item.thumbnail : asset_url+version_library+'icon/empty_post.png'" alt="" />
+              </div>
+              <div class="modal-body_ads_item_detail">
+                <div class="top">
+                  <p class="modal-body_ads_item_detail_title _mb_4">{{ item.title ? item.title : '' }}</p>
+                  <span class="_fs_12">ID: {{ item.id }} {{ $t(`account_t.view`)  }}: {{ item && item.views ? item.views : 0 }}</span>
+                  <span class="_fs_12">{{ $t(`account_t.posted`)  }}: {{ forMatDate(item.posted_date) }}</span>
+                  <span class="_fs_12" v-if="item.renew_date"  >{{ $t(`account_t.renewed`) }}: {{ forMatDate(item.renew_date) }}</span>
+                </div>
+                <div class="bottom">
+                  <span>{{ item.price ? '$'+ formatAmount(item.price) : '' }} </span>
+                </div>
+              </div>
+            </div>
+            <VueEternalLoading :load="loadAd" v-model:is-initial="isInitialMyAd" class="mb-4 mt-2">
+                <template #loading>
+                  <div class="text-center mt-4">
+                      <img :src="asset_url+version_library+'img/newLoading.gif'" alt="Loading..." class="loading_width">
+                  </div>
+                </template>
+                <template #no-more>
+                  <div class="my-no-more enternal_loading_message">
+                    {{ $t('message.no_more_result')}}
+                  </div>
+                </template>
+                <template #no-results>
+                  <div class="my-no-results enternal_loading_message">
+                    {{ $t('message.no_result')}}
+                  </div>
+                </template>
+
+                <template #error>
+                  <div class="my-error enternal_loading_message">
+                    Oops. We've got an error.
+                  </div>
+                </template>
+              </VueEternalLoading>
+          </div>
+        </div>
+        
+        <div id="changePremiumContent" class="modal-content sliding-element d-none" :class="!mobileDevice ? 'mobile_content_adsmodal_desktop' : 'mobile_content_adsmodal_mobile'">
+          <div class="mobile_content_adsmodal_navbar">
+            <button @click="navigateMyAdModalContent('#changePremiumContent')" class="mobile_content_adsmodal_navbar_icon"><i class="bi bi-chevron-left custom_bi"></i></button>
+            <span class="mobile_content_adsmodal_navbar_title">{{ changeAd ?  $t('account_t.change_ad') : $t('account_t.set_ad') }}</span>
+          </div>
+          <div class="modal-body modal-body-adsmodal d-flex flex-column justify-content-start align-items-center pt-3">
+            <div class="adsmodal_change_premium_ad_card rounded-2">
+                <div class="adsmodal_change_premium_ad_card_thumnail">                        
+                  <img :src="changeAdSelected && changeAdSelected.thumbnail ? changeAdSelected.thumbnail : asset_url+version_library+'icon/empty_post.png'" alt="" />
+                </div>
+                <div class="adsmodal_change_premium_ad_card_detail">
+                  <div class="adsmodal_change_premium_ad_card_detail_description">
+                      <p class="adsmodal_change_premium_ad_card_detail_description_title _mb_4">{{ changeAdSelected ? changeAdSelected.title : '' }}</p>
+                      <span class="_fs_14">ID: {{ changeAdSelected ? changeAdSelected.id : '' }} {{ $t(`account_t.view`)  }}: {{ changeAdSelected && changeAdSelected.views? changeAdSelected.views : 0 }}</span>
+                      <span class="_fs_12">{{ $t(`account_t.posted`)  }}: {{ changeAdSelected ? forMatDate(changeAdSelected.posted_date) : '' }}</span>
+                      <span class="_fs_12">{{ $t(`account_t.renewed`) }}: {{ changeAdSelected ? formatDateWithTimeAgo(new Date(changeAdSelected.renew_date).getTime(), new Date().getFullYear()) : '' }}</span>
+                      <span class="adsmodal_change_premium_ad_card_detail_price">{{ changeAdSelected && changeAdSelected.price ? '$'+ formatAmount(changeAdSelected.price) : '' }}</span>
+                  </div>
+                </div>
+              </div>
+            <div class="mt-4 adsmodal_change_premium_ad_note_description">
+                <span><b>Note:</b> You can switch to post that has the same category only. Once you've change the paid Ads, you can change it again after 48 hours.</span>
+            </div>
+          </div>
+          <div class="modal_admodal_button_submit_wrapper py-2">
+            <button type="button" class="btn custom_btn_ form-control btn-lg text-white btn-k24-secondary rounded-2" @click="submitSetOrChangePaidAd">{{ $t(`message.submit`) }}</button>
+          </div>
+        </div> 
+      </div>
+    </div>
+
+    <!-- Change ads modal error -->
+    <div class="modal fade ov_background_erorr_modal" id="changeAdErrorModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="changeAdErrorModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered rounded-2 mx-auto" :class="mobileDevice ? 'vh-100' : ''">
+        <div class="modal-content mx-4 modal_content_error_changead_modal" :class="mobileDevice ? 'modal_content_change_ad_mobile' : ''">
+          <div class="modal-header d-flex justify-content-center py-3 border-1">
+            <p class="mb-0 adsmodal_change_premium_ad_card_detail_description_title">{{ $t(`account_t.problem_occurs`) }}</p>
+          </div>
+          <div class="modal-body modal_body_error_changead_modal" :class="mobileDevice ? 'overflow-y-scroll' : ''">
+              <span>{{ errorData.message ? errorData.message : '' }}</span>
+          </div>
+          <div class="modal-footer border-1 p-1">
+            <button type="button" class="btn ov_close_change_ad light_bg_btn w-100 text-black rounded-2" data-bs-dismiss="modal">{{ $t(`account_t.close`) }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 403 / 404 Modal -->
+    <div class="modal fade" id="failModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="Label" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered mx-auto" :class="mobileDevice ? 'vh-100' : '' ">
+        <div class="modal-content rounded-3" :class="mobileDevice ? 'fail_modal_content' : 'fail_modal_content_desktop'" >
+          <div class="modal-header d-flex justify-content-center py-3 border-1">
+            <h1 v-if="errorData.type" class="modal-title _fs_18" id="staticBackdropLabel">{{ $t(`account_t.${errorData.type}`)}}</h1>
+          </div>
+          <div class="modal-body py-3" :class="mobileDevice ? 'overflow-y-scroll overflow-x-hidden' : ''" >
+            <p class="text-center _fs_16">{{ errorData.message ? errorData.message : '' }}</p>
+          </div>
+          <div class="modal-footer d-flex justify-content-center p-1">
+            <button type="button" class="btn w-100 py-2 _fs_16 fw-medium light_bg_btn" data-bs-dismiss="modal">{{ $t(`account_t.close`)}}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Toast -->
+  <div class="toast_wrapper">
+    <div id="successToast" class="ov_renew_success_toast toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true" data-delay="3000">
+          <div class="d-flex">
+              <div class="toast-body d-flex gap-2 align-items-start">
+                <span class="toast_success_icon"><i class="bi bi-check-circle-fill"></i></span>
+                <span>{{ $t(`account_t.${successToastMessage}`) }}</span>
+            </div>
+        </div>
+    </div>
+  </div>  
+  <div class="toast_wrapper">
+    <div id="errorToast" class="ov_renew_erro_toast toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true" data-delay="3000">
+          <div class="d-flex">
+              <div class="toast-body d-flex gap-2 align-items-start">
+                <span class="toast_error_icon"><i class="bi bi-info-circle"></i></span>
+                <span class="text-black">{{ errorToastMessage }}</span>
+            </div>
+        </div>
+    </div>
+  </div>  
 </template>
 
 <script setup>
@@ -1676,44 +2872,47 @@ useHead({
   }
 
 
-  const share = async (post) => {
+const share = async (post) => {
+
+  const dataShare = {
+    title: post.title,
+    // text: "Cambodia on Khmer24.com", 
+    url: post.short_link || ""
+  }
+
+  await checkScreenUserAgent()
+
   if (resultCheck) {
-    if (navigator.share) {
-      try {
-        const dataShare = {
-          title: post.title || "",
-          text: "Check out this amazing content!",
-          url: post.short_link || "",
-        };
-  
-        console.log(dataShare)
-  
-        await navigator.share({
-          ...dataShare,
-        });
-        console.log("Content shared successfully!");
-      } catch (error) {
-        console.error("Error sharing:", error);
-      }
+
+    const allSupported = Object.entries(dataShare).every(([key, value]) => {
+      return navigator.canShare({ [key]: value });
+    });
+
+
+    if (allSupported) {
+      await navigator.share(dataShare);
     } else {
       alert("Sharing not supported in your browser");
     }
+
   } else {
-    
-    alert("Desktop modal show");
+    // alert("Show modal share desktop");
+    $("#modal_show_option_share").modal('show');
   } 
 };
 
 
+
 function detectMob(data) {
 
-  // check_screen_userAgent();
-  // if (check_screen_device.value) {
-  //   $("#modal_show_option_share").modal('hide');
-  //   phone_support_sharing(data); 
-  // } else {
-  //   $("#modal_show_option_share").modal('show');
-  // }
+  check_screen_userAgent();
+  if (check_screen_device.value) {
+    $("#modal_show_option_share").modal('hide');
+    phone_support_sharing(data); 
+  } else {
+    $("#modal_show_option_share").modal('show');
+  }
+
 }
 
 async function checkScreenUserAgent() {

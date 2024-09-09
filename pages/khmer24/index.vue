@@ -37,9 +37,9 @@ const toDetail = (title, id) => {
   router.push({ name: "khmer24-title-adid-id", params: { title: title, id: id } });
 };
 
-const share = async (post) => {
+const share1 = async (post) => {
   let title = post.data.title || ""
-  let text =  "Best selling website in cambo!"
+  let text = "Best selling website in cambo!"
   let url = post.data.short_link || ""
 
   await checkScreenUserAgent()
@@ -84,6 +84,52 @@ async function checkScreenUserAgent() {
   })
 }
 
+const share = (data) => {
+
+  // Data to share
+  const shareData = {
+    title: data.title,
+    text: data.title,
+    url: data.short_link,
+  };
+
+  // Check if the browser supports sharing some or all of these properties
+  if (navigator.canShare) {
+    const supported = {};
+
+    // Check for each property individually
+    if (navigator.canShare({ title: shareData.title })) {
+      supported.title = shareData.title;
+    }
+
+    if (navigator.canShare({ text: shareData.text })) {
+      supported.text = shareData.text
+    }
+
+    if (navigator.canShare({ url: shareData.url })) {
+      supported.url = shareData.url
+    }
+
+    alert('Supported properties:', supported);
+
+    // Share only if supported properties are present
+    if (Object.keys(supported).length > 0) {
+
+      navigator.share(supported).then(() => {
+        console.log('Data shared successfully!');
+      }).catch((error) => {
+        console.error('Error sharing:', error);
+      });
+
+    } else {
+      console.log('No supported share properties.');
+    }
+  } else {
+    console.log('Web Share API not supported.');
+  }
+
+}
+
 
 onMounted(() => {
   checkScreenUserAgent()
@@ -92,7 +138,7 @@ onMounted(() => {
 });
 </script>
  
-    <style >
+<style >
 .list_post {
   position: relative;
   border: 1px solid lightblue;
