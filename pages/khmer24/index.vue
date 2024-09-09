@@ -39,18 +39,18 @@ const toDetail = (title, id) => {
 const share = async (post) => {
 
   // await checkScreenUserAgent()
-  let dataShare = {
-    title: post.data.title || "",
-    text: post.data.title + " Check out this amazing content! ",
-    url: post.data.short_link || "",
-  };
-  
+
+  let title = post.data.title || ""
+  let text = post.data.title + " Check out this amazing content! "
+  let url = post.data.short_link || ""
+
   if (resultCheck) {
     if (navigator.canShare) {
       try {
-    
         await navigator.share({
-          ...dataShare,
+          title: title,
+          text: text,
+          url: url
         });
         console.log("Content shared successfully!");
       } catch (error) {
@@ -64,9 +64,6 @@ const share = async (post) => {
     alert('Show desktop Modal!')
   }
 };
-
-
-
 
 async function checkScreenUserAgent() {
   const toMatch = [
