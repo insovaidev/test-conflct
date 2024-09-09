@@ -1,6 +1,6 @@
 <template>
   <div class="p-4">
-    <pre class="absolute">{{ supportedPorperties }}</pre>
+    <pre class="absolute bg-white">{{ supportedPorperties }}</pre>
     <div :key="post" v-for="post in dataPosts" class="list_post">
       <div
         @click="toDetail(post.data.title, post.data.id)"
@@ -87,11 +87,10 @@ async function checkScreenUserAgent() {
 }
 
 const share = (data) => {
-
   // Data to share
   const shareData = {
     title: data.data.title,
-    text: `${data.data.title} Cambodia on Khmer24.com` ,
+    text: `${data.data.title} Cambodia on Khmer24.com`,
     url: data.data.short_link,
   };
 
@@ -105,32 +104,30 @@ const share = (data) => {
     }
 
     if (navigator.canShare({ text: shareData.text })) {
-      supported.text = shareData.text
+      supported.text = shareData.text;
     }
 
     if (navigator.canShare({ url: shareData.url })) {
-      supported.url = shareData.url
+      supported.url = shareData.url;
     }
 
-    supportedPorperties.value = supported
+    // This is useful for debugging or displaying which properties are supported
+    supportedPorperties.value = supported;
 
-    // Share only if supported properties are present
+    // Share only if at least one supported property is present
     if (Object.keys(supported).length > 0) {
-
-      navigator.share(supported).then(() => {
+      navigator.share(shareData).then(() => {
         console.log('Data shared successfully!');
       }).catch((error) => {
         console.error('Error sharing:', error);
       });
-
     } else {
       console.log('No supported share properties.');
     }
   } else {
     console.log('Web Share API not supported.');
   }
-
-}
+};
 
 
 onMounted(() => {
