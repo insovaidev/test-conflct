@@ -11,6 +11,13 @@
       { property: 'og:url', content: 'https://stately-squirrel-915b70.netlify.app/tweeter' },
       { property: 'og:locale', content: 'en_US' },
       { property: 'og:image', content: 'https://images.khmer24.co/24-09-09/-1-kg-3300--629490172587722261516483-b.jpg' },
+      { property: "og:image:width", content: "600" },
+      { property: "og:image:height", content: "600" },
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:title', content: 'The Intuitive Web Framework' },
+      { name: 'twitter:description', content: 'Build your next Vue.js application with confidence using Nuxt...' },
+      { name: 'twitter:image', content: 'https://images.khmer24.co/24-09-09/-1-kg-3300--629490172587722261516483-b.jpg' }
+   
   ]})
 
   
