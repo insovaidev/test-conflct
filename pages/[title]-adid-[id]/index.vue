@@ -64,8 +64,13 @@ useHead({
       property: "product:price:currency",
       content: dataPostDetial.value?.meta?.currency ?? "",
     },
-    { name: "twitter:card", content: "app" },
-    { name: "twitter:site", content: "@nytimesbits" },
+     // Twitter Card Tags
+    { name: "twitter:card", content: "summary_large_image" }, // This ensures a large image preview
+    { name: "twitter:title", content: dataPostDetial.value?.meta?.title ?? "" },
+    { name: "twitter:description", content: dataPostDetial.value?.meta?.description ?? "" },
+    { name: "twitter:image", content: dataPostDetial.value?.meta?.image ?? "" }, // Make sure this URL is correct
+    { name: "twitter:site", content: "@nytimesbits" }, // Replace with your own Twitter handle
+    { name: "twitter:creator", content: "@yourTwitterHandle" }, // Optional, replace with your Twitter handle
   ],
 });
 

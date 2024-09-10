@@ -10,6 +10,8 @@
         <p>{{ post.data.title }}</p>
       </div>
       <button @click="share(post)">Shere</button>
+      <button @click="shareToX(post.data.short_link)">shareToX</button>
+      <button @click="shareLinkToFacebook(post.data.short_link)">shareLinkToFacebook</button>
     </div>
   </div>
 </template>
@@ -138,6 +140,8 @@ const share = (data) => {
     console.log('Web Share API not supported.');
   }
 };
+
+
 
 
 onMounted(() => {
