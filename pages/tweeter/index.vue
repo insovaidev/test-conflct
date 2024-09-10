@@ -8,7 +8,7 @@
       { property: 'og:title', content: 'The Intuitive Web Framework' },
       { property: 'og:description', content: 'Build your next Vue.js application with confidence using Nuxt...' },
       { property: 'og:type', content: 'website' },
-      { property: 'og:url', content: 'https://nuxt.com' },
+      { property: 'og:url', content: 'https://stately-squirrel-915b70.netlify.app/tweeter' },
       { property: 'og:locale', content: 'en_US' },
       { property: 'og:image', content: 'https://images.khmer24.co/24-09-09/-1-kg-3300--629490172587722261516483-b.jpg' },
   ]})
