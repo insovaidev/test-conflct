@@ -65,6 +65,7 @@ useHead({
       content: dataPostDetial.value?.meta?.currency ?? "",
     },
      // Twitter Card Tags
+    { hid: 't-type', name: 'twitter:card', content: 'summary_large_image' },
     { name: "twitter:card", content: "summary_large_image" }, // This ensures a large image preview
     { name: "twitter:title", content: dataPostDetial.value?.meta?.title ?? "" },
     { name: "twitter:description", content: dataPostDetial.value?.meta?.description ?? "" },
