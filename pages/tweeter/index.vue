@@ -10,7 +10,7 @@
       { property: 'og:type', content: 'website' },
       { property: 'og:url', content: 'https://nuxt.com' },
       { property: 'og:locale', content: 'en_US' },
-      { property: 'og:image', content: 'https://nuxt.com/social.jpg' },
+      { property: 'og:image', content: 'https://images.khmer24.co/24-09-09/-1-kg-3300--629490172587722261516483-b.jpg' },
   ]})
 
   
