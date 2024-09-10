@@ -69,7 +69,7 @@ useHead({
     { name: "twitter:title", content: dataPostDetial.value?.meta?.title ?? "" },
     { name: "twitter:description", content: dataPostDetial.value?.meta?.description ?? "" },
     { name: "twitter:image", content: dataPostDetial.value?.meta?.image ?? "" }, // Make sure this URL is correct
-    { name: "twitter:site", content: "@nytimesbits" }, // Replace with your own Twitter handle
+    { name: "twitter:site", content: "@in_sovai" }, // Replace with your own Twitter handle
     { name: "twitter:creator", content: "@yourTwitterHandle" }, // Optional, replace with your Twitter handle
   ],
 });
