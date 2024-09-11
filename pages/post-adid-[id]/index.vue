@@ -87,11 +87,11 @@ useSeoMeta({
   title: 'My Amazing Site',
   ogTitle: 'My Amazing Site',
   ogDescription: 'This is my amazing site, let me tell you all about it.',
-  ogImage: `${dataPostDetial.value?.meta?.image ?? ""}`,
-  ogUrl: `${dataPostDetial.value?.meta?.url ?? ""}`, 
+  ogImage: `https://images.khmer24.co/24-09-06/dog-labubu-629490172558715920146508-b.jpg`,
+  ogUrl: `https://stately-squirrel-915b70.netlify.app/post-adid-11354275`, 
   twitterTitle: 'My Amazing Site',
   twitterDescription: 'This is my amazing site, let me tell you all about it',
-  twitterImage:  `${dataPostDetial.value?.meta?.image ?? ""}`,
+  twitterImage:  `https://images.khmer24.co/24-09-06/dog-labubu-629490172558715920146508-b.jpg`,
   twitterCard: 'summary',
 })
 
