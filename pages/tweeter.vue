@@ -12,16 +12,16 @@ useHead({
     // Open Graph Meta Tags
     { property: 'og:title', content: 'Nuxt - The Intuitive Web Framework' },
     { property: 'og:description', content: 'Nuxt is a web development framework built on top of Vue.js, offering full-stack capabilities and a powerful developer experience.' },
-    { property: 'og:image', content: 'https://nuxt.com/your-thumbnail.jpg' },
-    { property: 'og:url', content: 'https://nuxt.com' },
+    { property: 'og:image', content: 'https://images.khmer24.co/24-09-06/dog-labubu-629490172558715920146508-b.jpg' },
+    { property: 'og:url', content: 'https://stately-squirrel-915b70.netlify.app/tweeter' },
     { property: 'og:type', content: 'website' },
 
     // Twitter Card Meta Tags
     { name: 'twitter:card', content: 'summary_large_image' },
     { name: 'twitter:title', content: 'Nuxt - The Intuitive Web Framework' },
     { name: 'twitter:description', content: 'Nuxt is a web development framework built on top of Vue.js, offering full-stack capabilities and a powerful developer experience.' },
-    { name: 'twitter:image', content: 'https://nuxt.com/your-thumbnail.jpg' },
-    { name: 'twitter:url', content: 'https://nuxt.com' },
+    { name: 'twitter:image', content: 'https://images.khmer24.co/24-09-06/dog-labubu-629490172558715920146508-b.jpg' },
+    { name: 'twitter:url', content: 'https://stately-squirrel-915b70.netlify.app/tweeter' },
   ]
 })
 </script>
