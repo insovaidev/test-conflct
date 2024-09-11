@@ -7,9 +7,12 @@
 useSeoMeta({
   title: 'My Amazing Site',
   ogTitle: 'My Amazing Site',
-  description: 'This is my amazing site, let me tell you all about it.',
   ogDescription: 'This is my amazing site, let me tell you all about it.',
   ogImage: 'https://images.khmer24.co/24-09-06/dog-labubu-629490172558715920146508-b.jpg',
-  twitterCard: 'summary_large_image',
+  ogUrl: 'https://stately-squirrel-915b70.netlify.app/tweeter', 
+  twitterTitle: 'My Amazing Site',
+  twitterDescription: 'This is my amazing site, let me tell you all about it',
+  twitterImage: 'https://images.khmer24.co/24-09-06/dog-labubu-629490172558715920146508-b.jpg',
+  twitterCard: 'summary',
 })
 </script>
