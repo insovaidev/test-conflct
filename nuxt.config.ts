@@ -8,5 +8,6 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     'nuxt-jsonld',
     '@nuxtjs/device',
+    'nuxt-jsonld'
   ],
 })

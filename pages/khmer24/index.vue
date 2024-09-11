@@ -10,8 +10,7 @@
         <p>{{ post.data.title }}</p>
       </div>
       <button @click="share(post)">Shere</button>
-      <button @click="shareToX(post.data.short_link)">shareToX</button>
-      <button @click="shareLinkToFacebook(post.data.short_link)">shareLinkToFacebook</button>
+      
     </div>
   </div>
 </template>
@@ -124,7 +123,6 @@ const share = (data) => {
     // This is useful for debugging or displaying which properties are supported
     supportedPorperties.value = supported;
 
-    console.log(shareData)
 
     // Share only if at least one supported property is present
     if (Object.keys(supported).length > 0) {
@@ -148,6 +146,9 @@ onMounted(() => {
   checkScreenUserAgent()
   getPosts();
   console.log("Console me");
+  
+  console.log(checkUserAgent())
+
 });
 </script>
  
