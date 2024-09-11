@@ -79,7 +79,7 @@ useSeoMeta({
   title: 'My Amazing Site',
   ogTitle: 'My Amazing Site',
   ogDescription: 'This is my amazing site, let me tell you all about it.',
-  ogImage: 'https://images.khmer24.co/24-09-06/dog-labubu-629490172558715920146508-b.jpg',
+  ogImage: `${dataPostDetial.value?.meta?.image ?? ""}`,
   ogUrl: `${dataPostDetial.value?.meta?.url ?? ""}`, 
   twitterTitle: 'My Amazing Site',
   twitterDescription: 'This is my amazing site, let me tell you all about it',
