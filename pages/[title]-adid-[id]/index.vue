@@ -15,65 +15,78 @@ const dataPostDetial = useState('dataPostDetial', () => '')
 // const baseApiUrl = `http://localhost:1234/`
 const baseApiUrl = `https://test-post-share-api.onrender.com/`
 
-useHead({
-  title: dataPostDetial.value?.meta?.title ?? '',
-  meta: [
-    {
-      name: "keywords",
-      content: dataPostDetial.value?.meta?.keyword ?? "",
-    },
-    {
-      name: "description",
-      content: dataPostDetial.value?.meta?.description ?? "",
-    },
-    {
-      property: "og:title",
-      content: dataPostDetial.value?.meta?.title ?? "",
-    },
-    {
-      property: "fb:app_id",
-      content: dataPostDetial.value?.meta?.fb?.id ?? "",
-    },
-    {
-      property: "og:type",
-      content: dataPostDetial.value?.meta?.fb?.type ?? "",
-    },
-    {
-      property: "og:site_name",
-      content: dataPostDetial.value?.meta?.site_name ?? "",
-    },
-    {
-      property: "og:url",
-      content: dataPostDetial.value?.meta?.url ?? "",
-    },
-    {
-      property: "og:image",
-      content: dataPostDetial.value?.meta?.image ?? "",
-    },
-    { property: "og:image:width", content: "600" },
-    { property: "og:image:height", content: "600" },
-    {
-      property: "og:description",
-      content: dataPostDetial.value?.meta?.description ?? "",
-    },
-    {
-      property: "product:price:amount",
-      content: dataPostDetial.value?.meta?.price?.toString() ?? "",
-    },
-    {
-      property: "product:price:currency",
-      content: dataPostDetial.value?.meta?.currency ?? "",
-    },
-     // Twitter Card Tags
-    { hid: 't-type', name: 'twitter:card', content: 'summary_large_image' },
-    { name: "twitter:card", content: "summary_large_image" }, // This ensures a large image preview
-    { name: "twitter:title", content: dataPostDetial.value?.meta?.title ?? "" },
-    { name: "twitter:description", content: dataPostDetial.value?.meta?.description ?? "" },
-    { name: "twitter:image", content: dataPostDetial.value?.meta?.image ?? "" }, // Make sure this URL is correct
-    { name: "twitter:site", content: "@in_sovai" }, // Replace with your own Twitter handle
-    { name: "twitter:creator", content: "@yourTwitterHandle" }, // Optional, replace with your Twitter handle
-  ],
-});
+// useHead({
+//   title: dataPostDetial.value?.meta?.title ?? '',
+//   meta: [
+//     {
+//       name: "keywords",
+//       content: dataPostDetial.value?.meta?.keyword ?? "",
+//     },
+//     {
+//       name: "description",
+//       content: dataPostDetial.value?.meta?.description ?? "",
+//     },
+//     {
+//       property: "og:title",
+//       content: dataPostDetial.value?.meta?.title ?? "",
+//     },
+//     {
+//       property: "fb:app_id",
+//       content: dataPostDetial.value?.meta?.fb?.id ?? "",
+//     },
+//     {
+//       property: "og:type",
+//       content: dataPostDetial.value?.meta?.fb?.type ?? "",
+//     },
+//     {
+//       property: "og:site_name",
+//       content: dataPostDetial.value?.meta?.site_name ?? "",
+//     },
+//     {
+//       property: "og:url",
+//       content: dataPostDetial.value?.meta?.url ?? "",
+//     },
+//     {
+//       property: "og:image",
+//       content: dataPostDetial.value?.meta?.image ?? "",
+//     },
+//     { property: "og:image:width", content: "600" },
+//     { property: "og:image:height", content: "600" },
+//     {
+//       property: "og:description",
+//       content: dataPostDetial.value?.meta?.description ?? "",
+//     },
+//     {
+//       property: "product:price:amount",
+//       content: dataPostDetial.value?.meta?.price?.toString() ?? "",
+//     },
+//     {
+//       property: "product:price:currency",
+//       content: dataPostDetial.value?.meta?.currency ?? "",
+//     },
+//      // Twitter Card Tags
+//     { hid: 't-type', name: 'twitter:card', content: 'summary_large_image' },
+//     { name: "twitter:card", content: "summary_large_image" }, // This ensures a large image preview
+//     { name: "twitter:title", content: dataPostDetial.value?.meta?.title ?? "" },
+//     { name: "twitter:description", content: dataPostDetial.value?.meta?.description ?? "" },
+//     { name: "twitter:image", content: dataPostDetial.value?.meta?.image ?? "" }, // Make sure this URL is correct
+//     { name: "twitter:site", content: "@in_sovai" }, // Replace with your own Twitter handle
+//     { name: "twitter:creator", content: "@yourTwitterHandle" }, // Optional, replace with your Twitter handle
+//   ],
+// });
+
+useSeoMeta({
+  title: 'My Amazing Site',
+  ogTitle: 'My Amazing Site',
+  ogDescription: 'This is my amazing site, let me tell you all about it.',
+  ogImage: 'https://images.khmer24.co/24-09-06/dog-labubu-629490172558715920146508-b.jpg',
+  ogUrl: `${dataPostDetial.value?.meta?.url ?? ""}`, 
+  twitterTitle: 'My Amazing Site',
+  twitterDescription: 'This is my amazing site, let me tell you all about it',
+  twitterImage: `${dataPostDetial.value?.meta?.image ?? ""}`,
+  twitterCard: 'summary',
+})
+
 
 const id = route.params.id
 const title = route.params.title

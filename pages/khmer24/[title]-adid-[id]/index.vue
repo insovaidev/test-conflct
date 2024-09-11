@@ -68,6 +68,7 @@ useHead({
   ],
 });
 
+
 const id = route.params.id
 const title = route.params.title
 
