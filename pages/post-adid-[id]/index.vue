@@ -10,7 +10,15 @@
 </template>
 
 <script setup>
+
 const route = useRoute()
+
+
+onMounted(() => {
+  
+  console.log()
+})
+
 const dataPostDetial = useState('dataPostDetial', () => '')
 // const baseApiUrl = `http://localhost:1234/`
 const baseApiUrl = `https://test-post-share-api.onrender.com/`
@@ -83,9 +91,10 @@ useSeoMeta({
   ogUrl: `${dataPostDetial.value?.meta?.url ?? ""}`, 
   twitterTitle: 'My Amazing Site',
   twitterDescription: 'This is my amazing site, let me tell you all about it',
-  twitterImage: `${dataPostDetial.value?.meta?.image ?? ""}`,
+  twitterImage:  `${dataPostDetial.value?.meta?.image ?? ""}`,
   twitterCard: 'summary',
 })
+
 
 
 const id = route.params.id
