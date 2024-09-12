@@ -1,106 +1,26 @@
-   <template>
-  <div class="p-4">
-    <div
-      
-      :key="post"
-      v-for="post in dataPosts"
-      class="list_post"
-    >
-    <div @click="toDetail(post.data.title, post.data.id)" class="border-[1px] rounded-md mb-2 p-2">
-      <p>{{ post.data.id }}</p>
-      <p>{{ post.data.title }}</p>
+<template>
+
+  
+
+<div v-for="item in 16" :key="item" class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    <a href="#">
+        <img class="rounded-t-lg" src="https://images.khmer24.co/24-07-30/782332-urgent-s…on-1-bedroom-17th-floor-1722346338-25792676-b.jpg" alt="" />
+    </a>
+    <div class="p-5">
+        <a href="#">
+            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Noteworthy technology acquisitions 2021</h5>
+        </a>
+        <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">Here are the biggest enterprise technology acquisitions of 2021 so far, in reverse chronological order.</p>
+        <a href="#" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+            Read more
+             <svg class="rtl:rotate-180 w-3.5 h-3.5 ms-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+            </svg>
+        </a>
     </div>
-    <div class="gap-3">
-      <button class="border-[1px] border-gray-500 rounded-md px-3 py-1" @click="share(post)">Shere</button>
-      <button  class="border-[1px] border-gray-500 rounded-md px-3 py-1" @click="shareToX(post.data.short_link)">shareToX</button>
-      <button class="border-[1px] border-gray-500 rounded-md px-3 py-1" @click="shareLinkToFacebook(post.data.short_link)">shareLinkToFacebook</button>
-    </div>
-    </div>
-  </div>
+</div>
+
 </template>
-
-   <script setup>
-const baseApiUrl = `https://test-post-share-api.onrender.com/`;
-const router = useRouter();
-const dataPosts = ref([]);
-
-const getPosts = async () => {
-  try {
-    const res = await $fetch(`${baseApiUrl}api/posts`);
-    if (res) {
-      dataPosts.value = res;
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-const toDetail = (title, id) => {
-  router.push({ name: "post-adid-id", params: { id: id } });
-};
-
-const share = async (post) => {
-  if (navigator.share) {
-    try {
-      const dataShare = {
-        title: post.data.title || "",
-        text: "Check out this amazing content!",
-        url: post.data.short_link || "",
-      };
-
-      await navigator.share({
-        ...dataShare,
-      });
-      console.log("Content shared successfully!");
-    } catch (error) {
-      console.error("Error sharing:", error);
-    }
-  } else {
-    alert("Sharing not supported in your browser");
-  }
-};
-
-const shareToX = (uri) => {
-  try {
-    if (window.navigator.onLine) {
-      let url = uri
-      window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(''+url+''),'facebook-share-dialog','width=626,height=436');
-      return false;
-    } else {
-      return $('#modal_show_statu_error_connection').modal('show');
-    }
-  } catch (error) {
-    
-  }
-} 
-
-
-const shareLinkToFacebook = (uri) => {
-  try {
-    if (window.navigator.onLine) {
-      let url = uri
-      window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(''+url+''),'facebook-share-dialog','width=626,height=436');
-      return false;
-  } else {
-      return $('#modal_show_status_error_connection').modal('show');
-  }
-  } catch (error) {
-    
-  }
-} 
-
-onMounted(() => {
-  getPosts();
-  console.log("Console me");
-});
+<script setup>
+definePageMeta({ layout: '', middleware: 'device' })
 </script>
-
-   <style >
-.list_post {
-  position: relative;
-  border: 1px solid lightblue;
-  padding: 8px;
-  margin-bottom: 3rem;
-  border-radius: 8px;
-}
-</style>
