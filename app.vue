@@ -7,10 +7,11 @@
 
 <script setup>
 
-
-
+definePageMeta({ middleware: "device" });
 
 const layout = useRoute().params.isMobile == "true" ? "mobile" : "desktop"
+
+
 
 
 </script>
