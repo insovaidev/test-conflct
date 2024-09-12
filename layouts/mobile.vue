@@ -10,15 +10,14 @@
 <script setup>
 const scale = useRoute().params.isMobile == "true" ? "1.0" : "0.0"
 
-useHead({
-  meta: [
-    {
-      name: 'viewport',
-      content: `width=device-width, initial-scale=1.0`,
-    },
-  ],
-});
-
+// useHead({
+//   meta: [
+//     {
+//       name: 'viewport',
+//        content:"width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+//     },
+//   ],
+// });
 
 </script>
 
@@ -30,7 +29,5 @@ useHead({
    display: flex;
    flex-direction: column;
 }
-
-
 
 </style>

@@ -8,14 +8,19 @@ export default defineNuxtConfig({
 
   // app: {
   //   head: {
+  //     link: [
+  //       {  rel: 'preload stylesheet', as: 'style', type: 'text/css', href: '/css/main.css' },
+  //     ],
   //     meta: [
   //       {
   //         name: 'viewport',
-  //         content: 'width=device-width, initial-scale=0.0',
+  //         content: 'width=device-width, initial-scale=1.0, user-scalable=no',
   //       },
   //     ],
   //   },
   // },
+
+
   modules: [
     '@nuxtjs/tailwindcss',
     'nuxt-jsonld',
@@ -25,3 +30,4 @@ export default defineNuxtConfig({
 
   compatibilityDate: '2024-09-12',
 })
+
