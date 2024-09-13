@@ -3,7 +3,7 @@ export function useMeta(content, backgroundColor, scale) {
    useHead({
       style: [
          {
-           children: `body { background-color: ${backgroundColor}; transform : scale(${scale});  touch-action: manipulation}`,
+           children: `body { background-color: ${backgroundColor}; touch-action: manipulation}`,
          },
        ],
       meta: [
