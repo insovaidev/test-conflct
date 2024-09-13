@@ -12,14 +12,14 @@ const scale = useRoute().params.isMobile == "true" ? "1.0" : "0.0"
 
 
 function setUseHead() {
-   useHead({
-     meta: [
-       {
-         name: 'viewport',
-         content:"width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-       },
-     ],
-   });
+   // useHead({
+   //   meta: [
+   //     {
+   //       name: 'viewport',
+   //       content:"width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+   //     },
+   //   ],
+   // });
 }
 
 

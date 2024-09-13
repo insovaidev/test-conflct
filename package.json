@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@nuxtjs/device": "^3.2.2",
+    "nitropack": "^2.9.7",
     "nuxt": "^3.11.1",
     "nuxt-gtag": "^2.1.0",
     "nuxt-jsonld": "^2.0.8",
@@ -20,6 +21,7 @@
     "vue-router": "^4.3.0"
   },
   "devDependencies": {
-    "@nuxtjs/tailwindcss": "^6.11.4"
+    "@nuxtjs/tailwindcss": "^6.11.4",
+    "nuxi": "^3.13.1"
   }
 }

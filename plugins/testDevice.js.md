@@ -1,7 +1,8 @@
-import { defineNitroPlugin } from '#app'
+import { defineNitroPlugin } from 'nitropack'
 
 export default defineNitroPlugin((nitroApp) => {
-
+  
+  console.log('api test', isMobile)
   
   nitroApp.hooks.hook('render:html', (html, { event }) => {
     const userAgent = event.req.headers['user-agent'];

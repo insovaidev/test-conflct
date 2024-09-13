@@ -1,0 +1,47 @@
+import { defineNuxtPlugin } from '#app'
+
+export default defineNuxtPlugin((nuxtApp) => {
+  console.log('test Device')
+  if (process.server) {
+    nuxtApp.hooks.hook('render:html', (html, { event }) => {
+      const userAgent = event.req.headers['user-agent'];
+      const isMobile = /mobile/i.test(userAgent);
+      
+      console.log('isMobile', isMobile)
+
+
+      if (!isMobile) {
+        useHead({
+          style: [
+             {
+               children: `body background-color: #f0f0f0; /* Light background for desktop */`,
+             },
+           ],
+          meta: [
+             {
+                name: 'viewport',
+                content: 'width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0'
+             },
+          ],
+       });
+
+      } else {
+        // Mobile: Set viewport and background 
+        useHead({
+          style: [
+             {
+               children: `body  background-color: #000000; /* Dark background for mobile */`,
+             },
+           ],
+          meta: [
+             {
+                name: 'viewport',
+                content: 'width=device-width, user-scalable=no, initial-scale=0.0, maximum-scale=0.0'
+             },
+          ],
+       });
+      }
+    });
+  }
+});
+
