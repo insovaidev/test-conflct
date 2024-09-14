@@ -4,41 +4,39 @@ export default defineNitroPlugin((nitroApp) => {
       const userAgent = event.req.headers['user-agent'];
       const isMobile = /mobile/i.test(userAgent);
 
-      console.log('server plugin isMobile', isMobile )
+      // <meta name="viewport" content="width=device-width, initial-scale=1">
+      // html.body.push('<h1>Push from plugin</h1>')
+      // html.head.push(`
+      //    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+      //  `);
 
-      let headObject = html.head
+   //    if (!isMobile) {
+   //       // Desktop: Set viewport and background style
+   //       html.head.push(`
+   //         <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
+   //       `);
+   //       html.head.push(`
+   //         <style>
+   //           body {
+   //             // background-color: #f0f0f0; /* Light background for desktop */
+   //           }
+   //         </style>
+   //       `);
+   //     } else {
+   //       // Mobile: Set viewport and background style
+   //       html.head.push(`
+   //         <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=0.0, maximum-scale=0.0">
+   //       `);
+   //       html.head.push(`
+   //         <style>
+   //           body {
+   //             // background-color: #000000; /* Dark background for mobile */
+   //           }
+   //         </style>
+   //       `);
+   //     }
 
-      // headObject.toString().replace('<meta name="viewport" content="width=device-width, initial-scale=1">', '<meta name="viewport" content="width=device-width, min-width=980, user-scalable=no, initial-scale=0.0, maximum-scale=0.0">')
-
-      console.log(headObject)
-
-      // if (!isMobile) {
-      //    // Desktop: Set viewport and background style
-      //    html.head.push(`
-      //      <meta name="viewport" content="width=device-width, min-width=980, user-scalable=no, initial-scale=0.0, maximum-scale=0.0">
-      //    `);
-      //    html.head.push(`
-      //      <style>
-      //        body {
-      //          background-color: #f0f0f0; /* Light background for desktop */
-      //        }
-      //      </style>
-      //    `);
-      //  } else {
-      //    // Mobile: Set viewport and background style
-      //    html.head.push(`
-      //      <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0">
-      //    `);
-      //    html.head.push(`
-      //      <style>
-      //        body {
-      //          background-color: #000000; /* Dark background for mobile */
-      //        }
-      //      </style>
-      //    `);
-      //  }
-      
-    
+   //     console.log(html.head[0])
 
     });
 

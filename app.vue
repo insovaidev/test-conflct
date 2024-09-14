@@ -10,60 +10,27 @@
 const test = ref('')
 const layoutName = ref('')
 
-definePageMeta({ middleware: "device" });
+definePageMeta({ middleware: "" });
 
 const layout = useRoute().params.isMobile == "true" ? "mobile" : "desktop"
 
 
-
-
-function viewportHandler(event) {
-   // NOTE: This doesn't actually work at time of writing
-   // if (event.target.scale > 3) {
-   //    document.body.classList.remove("hide-text");  
-   // } else {
-   //    document.body.classList.add("hide-text");
-   // }
-  test.value = event.target.scale
-
-//   console.log()
-   
+function adjustViewport() {
+   let viewportMetaTag = document.querySelector('meta[name="viewport"]');
+   if (window.innerWidth > 768) {
+      viewportMetaTag.setAttribute('content', `width=device-width, initial-scale=0`);
+   } else {
+      viewportMetaTag.setAttribute('content', 'width=device-width, initial-scale=1');
+   }
 }
-
-function zoomPage(scale) {
-  document.body.style.zoom = scale;
-}
-
-
-function callMe () {
-   document.body.style.transform = "scale(0.42)";
-}
-
-
-function requestDesktopSite() {
-// if(layout == 'desktop') {
-   document.getElementsByTagName('meta')['viewport'].content='min-width: 980px;';
-   layoutName.value = 'desktop'
-   //  }
-}
-   
-   
-function requestMobileSite() {
-   document.getElementsByTagName('meta')['viewport'].content='width=device-width, initial-scale=1.0, user-scalable=n';
-   layoutName.value = 'mobile'
-}
-
-
-// if (process.client) {
-//    if (layout == 'mobile') {
-//       requestMobileSite()
-//    } else {
-//       requestDesktopSite()
-//    }
-// }
 
 
 onMounted(() => {
+
+   if (process.client) {
+      // adjustViewport()
+      // window.onresize = adjustViewport;
+   }
 
 
    // requestDesktopSite()
@@ -96,4 +63,10 @@ onMounted(() => {
 
 
 </script>
+
+<style>
+body {
+   background: rgb(239, 237, 237);
+}
+</style>
 
