@@ -29,6 +29,9 @@ export default defineNuxtConfig({
   ],
 
   compatibilityDate: '2024-09-12',
+  device: {
+    refreshOnResize: true
+  },
 
 })
 

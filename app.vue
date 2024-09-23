@@ -1,5 +1,9 @@
 <template>
-   <NuxtLayout :name="layout">
+   <NuxtLayout>
+      <pre>layout: {{ layout }}</pre>
+      <br />
+      <pre>latestUpdate: {{ latestUpdate }}</pre>
+
       <NuxtPage />
    </NuxtLayout>
 </template>
@@ -7,58 +11,53 @@
 
 <script setup>
 
+const layoutReference = ref('')
 const test = ref('')
 const layoutName = ref('')
+const latestUpdate = ref('')
 
-definePageMeta({ middleware: "" });
+definePageMeta({ middleware: "device", layout: ''});
 
 const layout = useRoute().params.isMobile == "true" ? "mobile" : "desktop"
 
-
 function adjustViewport() {
+
    let viewportMetaTag = document.querySelector('meta[name="viewport"]');
-   if (window.innerWidth > 768) {
-      viewportMetaTag.setAttribute('content', `width=device-width, initial-scale=0`);
-   } else {
-      viewportMetaTag.setAttribute('content', 'width=device-width, initial-scale=1');
-   }
+
+   // if (window.innerWidth > 768 && layout == 'desktop') {
+      latestUpdate.value = new Date().getTime().toLocaleString() + layout + window.innerWidth
+   //    viewportMetaTag.setAttribute('content', `width=device-width, initial-scale=0`);
+   // } else if (window.innerWidth > 768 && layout == 'mobile') {
+   //    latestUpdate.value = new Date().getTime().toLocaleString() + 'desktop' + window.innerWidth
+   //    viewportMetaTag.setAttribute('content', 'width=device-width, initial-scale=1');
+   // }
+   // else {
+   //    latestUpdate.value = new Date().getTime().toLocaleString() + 'desktop' + window.innerWidth
+   //    viewportMetaTag.setAttribute('content', 'width=device-width, initial-scale=1');
+   // }
+
+      // if (layout=='desktop') {
+      if (window.innerWidth > 768)  {
+         var meta = document.createElement('meta');
+         meta.setAttribute('name', 'viewport');
+         meta.setAttribute('content', 'width=device-width, initial-scale=1');
+         document.head.appendChild(meta);
+      } else {
+        
+      }
 }
+
+
+
 
 
 onMounted(() => {
 
    if (process.client) {
-      // adjustViewport()
-      // window.onresize = adjustViewport;
+      adjustViewport()
+      window.onresize = adjustViewport;
    }
 
-
-   // requestDesktopSite()
-   // console.log(document.getElementsByTagName('meta')['viewport'])
-   // if (process.cli)
-   // if (layout == "desktop") {
-   //    // test.value = '0.42'
-   //    document.getElementsByTagName('meta')['viewport'].content='min-width: 980px;';
-   // }
-
-   // test.value = window.innerWidth
-   // document.addEventListener("gesturestart", function (e) {
-   //    e.preventDefault();
-   //     document.body.style.zoom = 0.99;
-   // });
-   
-   // document.addEventListener("gesturechange", function (e) {
-   //    e.preventDefault();
-   
-   //   document.body.style.zoom = 0.99;
-   // });
-   // document.addEventListener("gestureend", function (e) {
-   //      e.preventDefault();
-   //     document.body.style.zoom = 1;
-   // });
-
-
-   // window.visualViewport.addEventListener("resize", viewportHandler);
 })
 
 
