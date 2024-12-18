@@ -1,0 +1,9 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "khmer24.com",
+    "sha256_cert_fingerprints":
+    ["00:AD:2B:A2:4B:92:C8:AB:0F:5C:51:93:26:8A:2E:F2:6C:94:A7:73:FA:76:E5:49:02:A9:2D:CA:3C:7B:23:19"]
+  }
+}]

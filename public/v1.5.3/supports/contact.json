@@ -1,0 +1,98 @@
+{
+    "phone": [
+      {
+        "title": "Cellcard",
+        "slug": "cellcard",
+        "icon": "https://images.khmer24.co/app/images/sim/cellcard.png",
+        "tel": "+85592724724",
+        "phone": "092724724"
+      },
+      {
+        "title": "Smart",
+        "slug": "smart",
+        "icon": "https://images.khmer24.co/app/images/sim/smart.png",
+        "tel": "+85581724724",
+        "phone": "081724724"
+      },
+      {
+        "title": "Smart",
+        "slug": "smart",
+        "icon": "https://images.khmer24.co/app/images/sim/smart.png",
+        "tel": "+85593724724",
+        "phone": "093724724"
+      }
+    ],
+    "email": "info@khmer24.com",
+    "business_hours": {
+      "mon": {
+        "title": {
+          "en": "Monday",
+          "km": "ថ្ងៃច័ន្ទ"
+        },
+        "value": "08:00AM - 05:00PM",
+        "status": "open",
+        "open": "08:00:00",
+        "close": "17:00:00"
+      },
+      "tue": {
+        "title": {
+          "en": "Tuesday",
+          "km": "ថ្ងៃអង្គារ"
+        },
+        "value": "08:00AM - 05:00PM",
+        "status": "open",
+        "open": "08:00:00",
+        "close": "17:00:00"
+      },
+      "wed": {
+        "title": {
+          "en": "Wednesday",
+          "km": "ថ្ងៃពុធ"
+        },
+        "value": "08:00AM - 05:00PM",
+        "status": "open",
+        "open": "08:00:00",
+        "close": "17:00:00"
+      },
+      "thu": {
+        "title": {
+          "en": "Thursday",
+          "km": "ថ្ងៃព្រហស្បតិ៍"
+        },
+        "value": "08:00AM - 05:00PM",
+        "status": "open",
+        "open": "08:00:00",
+        "close": "17:00:00"
+      },
+      "fri": {
+        "title": {
+          "en": "Friday",
+          "km": "ថ្ងៃសុក្រ"
+        },
+        "value": "08:00AM - 05:00PM",
+        "status": "open",
+        "open": "08:00:00",
+        "close": "17:00:00"
+      },
+      "sat": {
+        "title": {
+          "en": "Saturday",
+          "km": "ថ្ងៃសៅរ៍"
+        },
+        "value": "08:00AM - 12:00PM",
+        "status": "open",
+        "open": "08:00:00",
+        "close": "12:00:00"
+      },
+      "sun": {
+        "title": {
+          "en": "Sunday",
+          "km": "ថ្ងៃអាទិត្យ"
+        },
+        "value": "Close",
+        "status": "close",
+        "open": null,
+        "close": null
+      }
+    }
+  }

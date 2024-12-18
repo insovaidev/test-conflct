@@ -1,0 +1,15 @@
+User-agent: *
+Disallow: /chats/
+Disallow: /notifications/
+Disallow: /manage-ads/
+Disallow: /likes/
+Disallow: /saved/
+Disallow: /setting/
+Disallow: /me/
+Disallow: /me/likes
+Disallow: /me/saved
+Disallow: /me/chats
+Disallow: /me/notifications
+Disallow: /me/posts
+Disallow: /me/apply_jobs
+Disallow: /me/job_applications
