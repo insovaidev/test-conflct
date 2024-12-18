@@ -216,14 +216,14 @@
     </div>
 
     <!-- Modal Comfirm Delete -->
-    <div class="modal fade" id="comfirmModal" tabindex="-1" aria-labelledby="comfirmModal" aria-hidden="true">
+    <div class="modal fade" id="comfirmModal" tabindex="-1" aria-labelledby="comfirmModal">
         <div class="modal-dialog modal-dialog-centered mx-auto p-3 rounded-2" :class="mobileDevice ? 'vh-100' : '' "> 
             <div class="modal-content rounded-2">
             <div class="modal-header comfirm_modal_header">
                 <h1 class="modal-title comfirm_modal-title" id="exampleModalLabel">{{   $t('account_t.comfirm_delete_address') }}</h1>
             </div>
                 <div class="modal-footer comfirm_modal-footer">
-                    <button type="button" class="bg-transparent border-0 mr-2" data-bs-dismiss="modal">{{ $t('account_t.cancel') }}</button>
+                    <button type="button" class="bg-transparent border-0 mr-2" @click="hideModals(['#comfirmModal'])">{{ $t('account_t.cancel') }}</button>
                     <button @click="deleteAddress(addressToDelete)" type="button"  class="bg-transparent border-0 text-danger">{{ $t('account_t.yes') }}</button>
                 </div>
             </div>

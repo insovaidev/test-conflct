@@ -17,7 +17,7 @@
                                 <i class="bi bi-bell-fill fn_23 fw-bold"></i>
                                 <span class="badge badge-danger style_badge " id="add_badge_not"> {{ not_cookie ? not_cookie : null  }} </span>
                             </nuxt-link>
-                            <nuxt-link @click="checkToChat(i_store)" aria-label="chats" class="item-icon btn py-0 ml_8" >
+                            <nuxt-link :to="localePath({ name: 'chats' })" aria-label="chats" class="item-icon btn py-0 ml_8" >
                                     <i class="bi bi-chat-dots-fill fn_23 fw-bold"></i>
                                     <span class="badge badge-danger style_badge " id="add_badge_chat"> {{ chat_cookie ? chat_cookie : null }} </span>
                             </nuxt-link>
@@ -128,7 +128,7 @@
                             </nuxt-link>
                         </div>
                         <span>
-                            <button @click="btn_create_post(i_store)" type="button" class="btn btn-k24-secondary km fn_20" :class="isMobile ? 'btn-height' : 'dt-btn-height'" id="desktop_ads_new_post">
+                            <button @click="btn_create_post" type="button" class="btn btn-k24-secondary km fn_20" :class="isMobile ? 'btn-height' : 'dt-btn-height'" id="desktop_ads_new_post">
                                 <i class="icon-camera icon_post_user"></i>
                                 <span class="ms-1">{{ $t('message.sell') }}</span>
                             </button>
@@ -199,7 +199,7 @@
                                 </template>
                             </li>
                         </ul>
-                        <button type="button" class="input-group-text field-input-height btn-search-dt" id="basic-addon2" name="search" @click="action_searchs"><i class="bi bi-search"></i></button>
+                        <button type="button"  class="input-group-text field-input-height btn-search-dt" id="basic-addon2" name="search" @click="action_searchs"><i class="bi bi-search"></i></button>
                         <div class="select-category">
                             <button class="btn dropdown-toggle w-100 field-input-height d-flex" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <div class="text-truncate box-cat fn_16">
@@ -423,23 +423,11 @@
             router.push(localePath({ name: 'setting-edit-profile'}))
         }else if(text === 'profile'){
             router.push(localePath({ name: 'account'}))
-        } 
+        }
     }
 
     function lg_rg(){
         localStorage.removeItem('save_state');
-    }
-
-    function checkToChat(data){
-        // console.log(data)
-        let qtr = {}
-        if(data){
-            qtr = {
-                pro_id: data.id,
-                from: 'store'
-            }
-        }
-        router.push(localePath({ name: 'chats', query: qtr }))
     }
 
     function get_profile() {
@@ -502,7 +490,6 @@
     }
 
     function click_top(array, index, object, type){
-        // console.log(object)
         if (index > 0) {
             // Remove the item from the array
             const [item] = array.splice(index, 1);
@@ -516,7 +503,6 @@
             router.push(localePath({ name: 'account' }))
         }else{
             let p_tmp = {
-                id: object.id,
                 username : object.username,
                 logo : object && object.logo ? object.logo : null,
             }
@@ -848,18 +834,22 @@
         check_auth.value = localStorage.getItem('auth_user') ? JSON.parse(localStorage.getItem('auth_user')) : ''; 
     }
     // ---- Create Post ----
-    function btn_create_post(isStore) {
+    function btn_create_post() {
         if (check_auth.value) {
             // -- if account have "phone_activated". Must to add phone when create ads --
             if (check_auth.value.user.phone_activated === false) {
                 router.push(localePath({ name: 'setting-change-phone', query: {from: 'post_ads'} }));
+
             } else {
-                if (isStore) {
-                    router.push(localePath({name: 'post', query: {'store_id': isStore.id}}));
+                // -- create post of store --
+                if (is_from_store.value) {
+                    router.push(localePath({name: 'post', query: {store_id: route.params.id}}));
+                // -- create post user --
                 } else {
                     router.push(localePath({name: 'post'}));
                 }
             }
+
         } else {
             // create state when login completed
             let expired = helper.Date_To_Timestamp('', 300, 'seconds');  // timestamp add 5 ( minute more 5 * 60 = 300 )
