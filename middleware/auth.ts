@@ -7,7 +7,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         "account", "chats", "post", "notification", "account-job-applications", 
         "apply-job-id", "account-membership", "account-subscriptions", "account-subscriptions-id", "orders-id", 
         "premium-account", "premium-account-category","premium-store", "premium-store-category", "premium-ad-category", 
-        "insight-id", "account-billing-addresses", "account-billing-addresses-add", "account-billing-addresses-edit", "checkout", "account-resume-summary",
+        "insight-id", "account-billing-addresses", "account-billing-addresses-add", "account-billing-addresses-edit", "checkout", "checkout-success", "account-resume-summary",
         "setting-change-password", "account-store-id", "setting-change-username", "account-resume-preferences", "account-resume-personal_details", "account-resume-references", "account-resume-references-id",
         "account-resume-skills", "account-resume-skills-id", "account-resume-educations", "account-resume-educations-id", "account-resume-languages", "account-resume-languages-id"
     ];

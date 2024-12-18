@@ -109,7 +109,6 @@
     ],
     "style": [],
     "script": [
-
       /* share to facebook */
       /*{ rel: 'preconnect', crossorigin: 'anonymous', async: true, defer: true, src: 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v7.0' },*/
 

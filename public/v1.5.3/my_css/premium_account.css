@@ -1744,7 +1744,6 @@
             flex-direction: column;
             align-items: center;
             padding: 0.8em;
-            /* font-size: 13px; */
             font-weight: 500;
             background-color: #ebebeb ;
         }
@@ -1755,15 +1754,15 @@
         }
 
 
-        .overide_member_ship_plan_card_status.active {
+        .overide_member_ship_plan_card_status.active, .overide_member_ship_plan_card_status.paid {
             background-color: #d7f3ff !important;
         }
 
-        .overide_member_ship_plan_card_status.cancelled, .overide_member_ship_plan_card_status.expired {
+        .overide_member_ship_plan_card_status.cancelled, .overide_member_ship_plan_card_status.expired, .overide_member_ship_plan_card_status.failed {
             background-color: #ff00001a !important;
         }
 
-        .overide_member_ship_plan_card_status.unpaid, .overide_member_ship_plan_card_status.nearly_expire {
+        .overide_member_ship_plan_card_status.unpaid, .overide_member_ship_plan_card_status.nearly_expire, .overide_member_ship_plan_card_status.awaiting_payment {
             background-color: #fff7eb !important;
         }
 
@@ -1778,15 +1777,15 @@
 
         }
 
-        .overide_member_ship_plan_card_status_title_span.active {
+        .overide_member_ship_plan_card_status_title_span.active, .overide_member_ship_plan_card_status_title_span.paid {
             color: #028dcf !important;
         }
 
-        .overide_member_ship_plan_card_status_title_span.cancelled, .overide_member_ship_plan_card_status_title_span.expired {
+        .overide_member_ship_plan_card_status_title_span.cancelled, .overide_member_ship_plan_card_status_title_span.expired, .overide_member_ship_plan_card_status_title_span.failed {
             color: #df2e00 !important;
         }
 
-        .overide_member_ship_plan_card_status_title_span.unpaid, .overide_member_ship_plan_card_status_title_span.nearly_expire {
+        .overide_member_ship_plan_card_status_title_span.unpaid, .overide_member_ship_plan_card_status_title_span.nearly_expire, .overide_member_ship_plan_card_status_title_span.awaiting_payment {
             color: #ff8900 !important;
         }
 
@@ -2227,7 +2226,6 @@
         }
 
 
-
         .other_plam_item_term_left {
             align-items: center;
             display: flex;
@@ -2247,6 +2245,18 @@
             position: relative;
         }
 
+        .form-check-label input[type="radio"]:checked {
+            /* position: absolute; */
+            content: url("/icon/check-circle-fill.svg");
+            margin: 0;
+            font: inherit;
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background-size: cover;
+            border: 0.15em solid white;
+        }
 
         .other_plam_item_term_left input[type="radio"]:checked {
             /* position: absolute; */
@@ -2684,8 +2694,8 @@
 
         .checkout_payment_detail_icon_wrapper {
             color: white;
-            width: 35px;
-            height: 35px;
+            width: 74px;
+            height: 44px;
             background-color: green;
             border-radius: 6px;
             display: flex;
@@ -2693,6 +2703,10 @@
             justify-content: center;
             object-fit: cover;
             margin-right: 1rem;
+        }
+
+        .method-title {
+            font-size: 14px;
         }
 
         .checkout_payment_detail_icon_wrapper img {
@@ -2887,10 +2901,11 @@
             color: #fff;
             font-size: 18px;
             font-weight: 500;
+            z-index: 99;
         }
         
         .congrate_modal_dialog {
-            max-width: 450px !important;
+            max-width: 550px !important;
             margin: 0 auto !important;
             padding: 2rem !important;
         }
@@ -2902,11 +2917,13 @@
         }
         
         .mobile_congrate_modal_cotent {
+            padding-top: 6rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-self: center;
             border-radius: 0 !important;
+            overflow-y: auto;
         }
         
         
@@ -3529,16 +3546,19 @@
             text-transform: capitalize;
         }
 
-        .account_subscription_status.unpaid {
+        .account_subscription_status.unpaid, .account_subscription_status.awaiting_payment, .account_subscription_status.nearly_expire {
             color: #ff8900 !important; 
         }
         
+        .account_subscription_status.pending {
+            color: gray !important; 
+        }
         
-        .account_subscription_status.paid {
+        .account_subscription_status.paid, .account_subscription_status.active {
             color: #028dcf !important;
         }
 
-        .account_subscription_status.cancelled {
+        .account_subscription_status.cancelled, .account_subscription_status.failed, .account_subscription_status.expired, .account_subscription_status.failed {
             color: #dc3545 !important;
         }
 
@@ -3709,7 +3729,7 @@
         }
 
         .account_sub_his_in_sub_card_title {
-            font-size: 14px;
+            font-size: 16px;
         }
 
         .account_sub_card_status {
@@ -3724,7 +3744,7 @@
             color: #53ab56 !important;
         }
 
-        .account_sub_card_status.cancelled {
+        .account_sub_card_status.cancelled, .account_sub_card_status.failed {
             color: #dc3545 !important;
         }
 
@@ -3735,7 +3755,7 @@
 
         .account_sub_card_price {
             position: absolute;
-            bottom: 1rem;
+            top: 38px;
             right: 1rem;
             font-size: 16px;
             font-weight: 500;
@@ -3746,13 +3766,18 @@
         }
 
         .account_sub_his_card_plan_title {
-            font-size: 14px !important;
+            font-size: 16px !important;
             font-weight: 500;
+            margin-bottom: 2px !important;
         }
         
         
         .sub_his_date_label_value {
             display: flex;
+        }
+        .sub_his_date_label {
+            color: black;
+            /* font-size: 14px; */
         }
 
    
@@ -3771,7 +3796,7 @@
         
         .account_sub_his_card_price {
             position: absolute;
-            bottom: 0;
+            top: 22px;
             right: 0;
             font-size: 16px;
             font-weight: 500;
@@ -3781,11 +3806,11 @@
             color: #53ab56 !important;
         }
 
-        .account_sub_his_card_status.cancelled {
+        .account_sub_his_card_status.cancelled,  .account_sub_his_card_status.failed{
             color: #dc3545 !important;
         }
 
-        .account_sub_his_card_status.pending {
+        .account_sub_his_card_status.pending, .account_sub_his_card_status.awaiting_payment {
             color: gray !important;
         }
 
@@ -3824,8 +3849,26 @@
         }
 
         .account_sub_card_valid {
+            font-size: 14px !important;
             color: gray !important;
         }
+        .account_sub_create_at {
+            font-size: 13px !important;
+            color: gray !important;
+        }
+        .account_sub_start_valid {
+            margin-top: 2px !important;
+            font-size: 14px !important;
+        }
+
+
+        .account_sub_detail_icon {
+            margin-left: 2px;
+            font-size: 12px !important;
+        }
+
+        
+
 
         .account_sub_renew_button_wrapper {
             background-color: white;
@@ -3908,7 +3951,7 @@
             position: relative;
         }
 
-        .order_detail_payment_status_wrapper.cancelled {
+        .order_detail_payment_status_wrapper.cancelled, .order_detail_payment_status_wrapper.failed {
             color: red !important;
         }
 
@@ -4469,7 +4512,7 @@
             font-size: 14px;
         }
 
-        .manage_ads_announcement_des_tile span.active {
+        .manage_ads_announcement_des_tile span.active, .manage_ads_announcement_des_tile span.paid {
             color: #028dcf !important;
         }
 
@@ -4477,11 +4520,19 @@
             color: gray !important;
         }
 
+        .manage_ads_announcement_des_tile span.awaiting_payment, .manage_ads_announcement_des_tile span.unpaid, .manage_ads_announcement_des_tile span.nearly_expire {
+            color: #ff8900 !important;
+        }
+
         .manage_ads_announcement_des_tile span.expired {
             color: #df2e00 !important;
         }
 
         .manage_ads_announcement_des_tile span.cancelled {
+            color: #df2e00 !important;
+        }
+
+        .manage_ads_announcement_des_tile span.failed {
             color: #df2e00 !important;
         }
 
@@ -4512,7 +4563,7 @@
         }
 
         .free_deliver_icon {
-            font-size: 18px;
+            font-size: 16px;
             color: #028dcf;
         }
         ._ml_5 {
@@ -4968,4 +5019,150 @@
 
     .expired_ad_actions > button:active{
         background: whitesmoke !important;
+    }
+
+    .modal-body-checkout-success .sugestion {
+        text-indent: 2em;
+        font-size: 18px;
+        font-weight: 500;
+    }
+
+    .modal-body-checkout-success .description {
+        margin-bottom: 6px;
+        font-size: 14px;
+    }
+
+    .modal-body-checkout-success .label , .total {
+        margin-bottom: 8px;
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    .modal-header-checkout-success h1 {
+        font-size: 24px;
+        font-weight: 600;
+        width: 100%;
+        text-align: center;
+    }
+
+    .checkout-success-min-vh {
+        min-height: 70vh !important ;
+    }
+    
+    .modal-content-checkout-success {
+        margin-top: -300px;
+    }
+    
+    .payment-method {
+        border-bottom: 1px solid #f3f0f0;
+        padding-bottom: 12px;
+    }
+    
+    .payment-method:last-child {
+        padding-bottom: 0;
+        border-bottom: 0;
+    }
+
+    .aba-checkout-desktop .aba-checkout-content .aba-close-button {
+        z-index: 999;
+    }
+
+    .success-checkout-container {
+        background-color: white;
+        border-radius: 6px;
+        display: flex;
+        flex-direction: column;
+        /* padding: 3rem; */
+        border: 1px solid #e5e7eb;
+    }
+    .success-checkout-icon {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 10px !important;
+        font-size: 64px !important;
+        width: 100px !important;
+        height: 100px !important;
+        color: #22c55e !important;
+        background-color: #f0fdf4;
+        border-radius: 50%;
+    }
+    .success-checkout-info > h1, .success-checkout-info > p {
+        text-align: center;
+    }
+    .success-checkout-info > h1 {
+        font-size: 26px;
+        font-weight: 600px;
+        margin-bottom: 1rem;
+    }
+    .success-checkout-details {
+        width: 100%;
+        background-color: #f9fafb;
+        border-radius: 4px;
+        padding: 0 0.5rem;
+        border: 1px solid #e5e7eb;
+    }
+    .success-checkout-details-item {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        padding: 0.8rem;
+        border-bottom: 1px solid #e5e7eb;   
+    }
+    .success-checkout-details-item:last-child {
+        border-bottom: 0;
+    }
+    .success-checkout-info > h2 {
+        text-align: start;
+        font-size: 18px;
+        font-weight: 600px;
+        color: #6b7280;
+    }
+    .success-checkout-info > p {
+        font-size: 18px;
+    }
+    .success-checkout-details-item .type {
+        font-weight: 500;
+    }
+    .checkout-success-desktop-peding {
+        padding: 4rem;
+    }
+
+    .checkout-success-details-modal {
+        width: 100%;
+        background-color: #f9fafb;
+        border-radius: 4px;
+        padding: 0 0.5rem;
+        border: 1px solid #e5e7eb;
+    }
+    
+    .checkout-success-details-label-modal {
+        font-size: 18px;
+    }
+    
+    .checkout-success-details-modal > h2 {
+        font-size: 14px;
+    }
+    
+    .footer-payment-method {
+        display: flex;
+        align-items: center;
+        justify-content: end;
+        gap: 10px;
+        padding-block: 1rem;
+    }
+
+    .footer-payment-method  p {
+        font-size: 16px;
+        color: #fff;
+    }
+
+    .footer-payment-method  .img-container {
+        width: 60px;
+        height: 35px;     
+    }
+
+    .footer-payment-method  img {
+        width: 60px;
+        height: 35px;        
     }

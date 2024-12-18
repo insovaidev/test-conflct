@@ -216,7 +216,7 @@
                                         <div class="order_detail_info_container">
                                             <p class="_mb_6">{{ $t('account_t.id') }}: {{ orderDetail?.id }}</p>
                                             <p class="_mb_6 text-capitalize">{{ $t('account_t.type') }}: {{ $t(`account_t.${orderDetail?.type}`) }}</p>
-                                            <p class="_mb_6 text-capitalize">{{ $t('account_t.payment_metods') }}: {{ $t(`account_t.${orderDetail?.payment_method?.type}`)}}</p>
+                                            <p class="_mb_6 text-capitalize">{{ $t('account_t.payment_metod') }}: {{ orderDetail?.payment_method?.title }}</p>
                                             <p class="mb-0 text-capitalize">{{ $t('account_t.created') }}: {{ forMatDate(orderDetail?.created_at?.split(' ')[0], locale)}}</p>
                                         </div>
                                     </section>

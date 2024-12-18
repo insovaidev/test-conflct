@@ -637,6 +637,9 @@
     "requird_att" : "Attachment in Required."
   },
   "account_t": {
+    "account": "Account",
+    "store": "Store",
+    "ad": "Ad",
     "membership": "Membership",
     "normal": "Normal",
     "member_ship_status": "Membership Status",
@@ -776,7 +779,7 @@
     "Top / Top Ads": "Top / Top Ads",
     "Featured / Featured Ads": "Featured / Featured Ads",
     "plan_type": "Plan Type",
-    "ads_id": "Ads ID",
+    "ads_id": "Ad ID",
     "store_id": "Store ID",
     "account_id": "Account ID",
     "price": "Price",
@@ -786,7 +789,13 @@
     "tax_id": "Tax ID", 
     "success": "Success",
     "boost_post": "Boost Post", 
-    "boost_post_des": "Boost this post to get more views." 
+    "boost_post_des": "Boost this post to get more views.",
+    "awaiting_payment": "Awaiting Payment",
+    "payment_metod": "Payment metod",
+    "online": "Online",
+    "created_at": "Created at",
+    "failed": "Failed",
+    "to_account": "Back To Account"
   }
 }
 

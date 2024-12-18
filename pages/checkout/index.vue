@@ -134,17 +134,20 @@
                         </div>
                     </NuxtLink>
                     <!-- Payment methoad -->
-                    <section v-if="defaultPaymentMethoad" class="checkout_payment_wrapper" :class="!mobileDevice ? 'rounded-1' : ''">
+                    <section v-if="paymentMethod.length > 0 " class="checkout_payment_wrapper" :class="!mobileDevice ? 'rounded-1' : ''">
                         <p class="checkout_payment_title" >{{$t(`account_t.payment_metods`)}}</p>
-                        <div class="checkout_payment_detail">   
-                            <div class="d-flex align-items-center">
+                            <label :for="method.value" v-for="method in paymentMethod" class="mb-2 border-1 d-flex align-items-center payment-method">
                                 <div class="checkout_payment_detail_icon_wrapper">
-                                    <img :src="asset_url+version_library+'img/dollar.jpg'" alt="" width="80" height="80" />
+                                    <img :src="method.logo?.small?.url ?? asset_url+version_library+'img/dollar.jpg'" :alt="method.title ?? ''" />
                                 </div>
-                                <p class="mb-0 checkout_payment_detail_title">{{  defaultPaymentMethoad ? defaultPaymentMethoad.title : '' }}</p>
-                            </div>
-                            <span class="mb-0 checkout_payment_check_icon"><i class="bi bi-check-circle-fill"></i></span>
-                        </div>
+                                <div class="d-flex flex-column align-items-start" >
+                                    <div class="form-check-label d-flex align-items-center gap-2" >
+                                        <strong>{{  method.title ?? '' }}</strong>
+                                        <input class="form-check-input" type="radio" :name="method.value" :id="method.value" :value="method" v-model="paymentMethodSelect" />
+                                    </div>
+                                    <p class="text-secondary method-title text-wrap mb-1">{{ method.description ?? '' }}</p>
+                                </div>
+                            </label>                      
                     </section>
                     <!-- Summary -->
                     <section v-if="cardCalData && cardCalData.payment" class="checkout_summary_wrapper" :class="!mobileDevice ? 'rounded-1' : ''">
@@ -179,7 +182,7 @@
                                         <p class="mb-0 checkout_total_summary_price">${{ cardCalData.payment ? formatAmount(cardCalData.payment.total) : ''}}</p>
                                     </div>
                                 </div>
-                                <button type="submit" @click="submitCheckout()" class="btn form-control-lg btn-xm btn-k24-secondary checkout_fotter_button_checkout_wrapper">{{$t(`account_t.checkout`)}}</button>
+                                <button type="submit" @click="submitCheckout()" class="btn form-control-lg btn-xm btn-k24-secondary checkout_fotter_button_checkout_wrapper text-capitalize">{{$t(`account_t.checkout`)}}</button>
                             </div>
                         </div>
                         <div v-if="!mobileDevice" >
@@ -193,7 +196,7 @@
                                         <p class="mb-0 checkout_total_summary_price">${{ cardCalData.payment ? formatAmount(cardCalData.payment.total) : 0}}</p>
                                     </div>
                                 </div>
-                                <button type="submit" @click="submitCheckout()" class="btn form-control btn-lg text-white btn-k24-secondary checkout_fotter_button_checkout_wrapper">{{$t(`account_t.checkout`)}}</button>
+                                <button type="submit" @click="submitCheckout()" class="btn form-control btn-lg text-white btn-k24-secondary checkout_fotter_button_checkout_wrapper text-capitalize">{{$t(`account_t.checkout`)}}</button>
                             </div>
                         </div>
                     </div>
@@ -216,20 +219,32 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Modal Submit Success -->
-    <div class="modal fade" id="checkout_congratulations_modal" tabindex="-1" aria-labelledby="checkout_congratulations_modal" aria-hidden="true" @click="redirectToAccount()">
+    <div class="modal fade" id="checkout_congratulations_modal" tabindex="-1" aria-labelledby="checkout_congratulations_modal" aria-hidden="true" @click="isDesktop ? redirectToAccount() : ''">
         <div class="modal-dialog" :class="isDesktop ? 'modal-dialog-centered congrate_modal_dialog' : 'modal-fullscreen mobile_congrate_modal_dialog'">
             <div class="modal-content congrate_modal_cotent" :class="isDesktop ? 'congrate_modal_cotent' : 'mobile_congrate_modal_cotent'">
-                <div class="check_icon position-relative">
-                    <div v-if="!isDesktop" class="checkout_modal_header">{{$t(`account_t.checkout`)}}</div>
+                <div class="check_icon position-relative" :class="mobileDevice ? 'pt-3' : ''" >
+                    <div v-if="!isDesktop" class="checkout_modal_header text-capitalize">{{$t(`account_t.checkout`)}}</div>
                     <div class="chek_icon_bouned checkout_congratulations_modal_success_wrapper flex"><i class="bi bi-check2 checkout_congratulations_modal_success_icon"></i></div>
                 </div>
                 <div class="checkout_message">
                     <h1>{{$t(`account_t.congratulation`)}}</h1>
                     <p>{{ submitPayResponse?.message ?? '' }}</p>
                 </div>
-                <button data-bs-dismiss="modal" type="button" @click="redirectToAccount()" class="back_account"><i class="bi bi-arrow-left"></i>{{$t(`account_t.back_to_acc`)}}</button>
+                <template  v-if="submitPayResponse.items && submitPayResponse.items.length > 0">  
+                    <h2 class="checkout-success-details-label-modal" >{{ locale == 'km' ? 'គម្រោងលម្អិត' : 'Subscription Details'}}:</h2>
+                    <div class="checkout-success-details-modal" >
+                        <div >
+                            <div v-for="item in submitPayResponse.items" class="success-checkout-details-item">
+                                <p class="mb-1 type">{{ $t(`account_t.id`) }}: {{ item.id ?? '' }}</p>   
+                                <p class="mb-1">{{ $t(`account_t.plan`) }}: {{ item.plan_title ?? '' }}</p>   
+                                <p class="mb-1">{{$t(`account_t.valid_until`) }}: {{ forMatDate(item.end_date) }}</p>    
+                            </div>
+                        </div>
+                    </div>
+                </template>
+                <button data-bs-dismiss="modal" type="button" @click="redirectToAccount()" class="w-50 form-control btn-lg btn-k24-primary mt-5 mx-auto text-capitalize">{{$t(`account_t.back_to_acc`)}}</button>
             </div>
         </div>
     </div>
@@ -250,6 +265,7 @@
             </div>
         </div>
     </div>
+    <div v-if="data" v-html="data.payment.html"></div>
 </template>
 
 <script setup>
@@ -257,7 +273,6 @@ definePageMeta({ layout: "custom", middleware: "auth" });
 
 import helper from "/helper";
 const mobileDevice = ref(helper.m_or_d())
-const language = ref(helper.get_lang_cookie());
 const { locale } = useI18n();
 const runtime_config = useRuntimeConfig();  
 const config = runtime_config.public
@@ -274,13 +289,25 @@ const defaultAddressInit = ref('')
 const address = ref('')
 const addresses = ref('')
 const addressSelected = useState('addressSelected', () => '') // the address while we click change address and apply.
-const defaultPaymentMethoad = ref('')
+const defaultPaymentMethoad = ref()
 const cardCalData = ref('')
 const cardCal = ref('')
-const submitPayResponse = reactive({ 'status': null, 'message': null })
+const submitPayResponse = reactive({ 'status': null, 'message': null, items: [] })
 const errorData = reactive({'type': null, 'message': null, 'code': null, 'status': null})
 const isLoadingButton = ref(null)
 const attemptRequest = ref(0)
+const paymentMethod = ref([])
+const data = ref()
+const paymentMethodSelect = ref('')
+const checkoutState = useState('checkoutState')
+
+checkoutState.value = {
+    order_id: '',
+    payment_method: '',
+    payment_option: '',
+    plan_title: '',
+    valid_until: '',
+}
 
 useHead({
     title: 'Checkout - Khmer24.com', 
@@ -442,7 +469,14 @@ async function getPaymentInfo() {
 
         if(response) {
             cardCalData.value = response
-            defaultPaymentMethoad.value = Array.isArray(response?.payment_methods) ? response?.payment_methods?.filter((v) => v.default == true)[0] : ''
+            defaultPaymentMethoad.value = Array.isArray(response?.payment_methods) ? response?.payment_methods?.filter((v) => v.default == true)[0] : null
+
+            if (defaultPaymentMethoad.value) {
+                paymentMethodSelect.value = defaultPaymentMethoad.value
+            }
+
+            paymentMethod.value = response.payment_methods ?? []
+
             await getAddress()
             isLoading.value = false
         }
@@ -478,9 +512,6 @@ async function submitPayment(id) {
     try {
         const paymentForm  = new FormData()
         paymentForm.append('order_id', id);
-        paymentForm.append('payment_option', defaultPaymentMethoad.value.option)
-        paymentForm.append('payment_method', defaultPaymentMethoad.value.value)
-
         const response = await $fetch(`${config.VUE_APP_API_URL_PAYMENT}payment/pay?lang=${locale.value}`, { 
             retry: 2, 
             retryDelay: 3000, 
@@ -492,6 +523,7 @@ async function submitPayment(id) {
         if(response) {
             submitPayResponse.status =  response?.status ?? null
             submitPayResponse.message =  response?.message ?? null
+            submitPayResponse.items =  response?.data?.items ?? null
             $('#checkout_congratulations_modal').modal('show')
         }
         isLoading.value = false 
@@ -516,6 +548,7 @@ async function submitPayment(id) {
 }
 
 async function submitCheckout() {
+    data.value = null
     isLoading.value = true
     await clearError()
     check_new_auth_user()
@@ -529,7 +562,7 @@ async function submitCheckout() {
             return
         }
 
-        const checkoutForm = new FormData()
+        const checkoutForm = new URLSearchParams()
         const calItems = Array.isArray(cardCalData.value?.items) && cardCalData.value.items.length ? cardCalData.value.items : []
         calItems.forEach((val) => {
             if(val.type == 'account') {
@@ -543,7 +576,13 @@ async function submitCheckout() {
 
         checkoutForm.append('type', 'plan')
         checkoutForm.append('address_id', parseInt(address.value.id));
-
+        checkoutForm.append('payment_option', paymentMethodSelect.value.option);
+        checkoutForm.append('payment_method', paymentMethodSelect.value.value);
+        checkoutForm.append('platform', 'web');
+        const lang = locale.value == 'km' ? 'km' : 'en'
+        const redirectUrl  = `https://www.khmer24.com/${lang}/checkout/success?id={id}`+(route.query.storeid ? '&storeid='+route.query.storeid : '')
+        checkoutForm.append('redirect', redirectUrl);
+    
         if (route.query.storeid) {     
             checkoutForm.append('storeid', route.query.storeid)
         }
@@ -553,14 +592,22 @@ async function submitCheckout() {
             retryDelay: 3000, 
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded", "Access-Token": auth.value.tokens.access_token }, 
-            body: new URLSearchParams(checkoutForm).toString()
+            body: checkoutForm
         })
-        
-        if(response && response.order_id) {
+
+        data.value = response
+
+        if (response?.payment?.html && paymentMethodSelect.value.option === 'online') {
+
+            setTimeout(() => {
+                AbaPayway.checkout()
+            }, 300);
+            
+        } else {
             await submitPayment(response.order_id)
         }
         
-    } catch (error) {
+    } catch (error) {    
         if(!error.response) {
             errorData.status = 500
             isLoading.value = false 
@@ -595,5 +642,6 @@ function redirectToAccount() {
         return router.push(localePath({ name: 'account'}))
     }
 }
+
 
 </script>

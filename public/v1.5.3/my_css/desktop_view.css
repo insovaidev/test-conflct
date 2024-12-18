@@ -915,8 +915,6 @@
     .dt-text{ color: #028dcf !important; }
     .dt-border-image{ border: 2px solid #028dcf !important; }
     .modal-backdrop{ z-index: 200 !important; }
-    .check_list_store{ position: absolute; z-index: 100; top: -3px }
-    .check_list_store .logo_check_store{ width: 20px;height: 20px; border-radius: 50%; border: 2px solid white }
 
     @media (min-width: 1024px ) {
         .screen-desktop{ position: fixed;}
