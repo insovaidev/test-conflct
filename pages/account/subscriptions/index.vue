@@ -93,7 +93,7 @@
                                                     <p class="mb-0 account_subscription_detail_id text-capitalize my_truncate_wrap">{{ $t(`account_t.${sub.type}_id`) }}: {{ sub.item_id }} </p>
                                                     <p class="mb-0 account_subscription_detail_category_term my_truncate_wrap">{{ sub.plan_title }} </p>
                                                     <p class="mb-0 account_subscription_detail_valid_date w-75">{{ $t(`account_t.valid_until`) }}: {{ forMatDate(sub.end_date, locale)}}</p>
-                                                    <p class="mb-0 account_subscription_detail_price my_truncate_wrap_signle_lin w-75">{{ $t(`account_t.price`) }}: <span>${{ formatAmount(sub.price)}}</span></p>
+                                                    <p class="mb-0 account_subscription_detail_price my_truncate_wrap_signle_lin w-75">{{ $t(`account_t.price`) }} ${{ formatAmount(sub.price)}} </p>
                                                 </div>
                                             </div>
                                             <button v-if="mobileDevice" @click="subscriptionOnModal = sub, $event.stopPropagation()" type="button" data-bs-toggle="modal" data-bs-target="#optionSubscriptionModal" class="position-absolute top-0 end-0 dropdown_toggle_custom" ><i class="bi bi-three-dots-vertical _center"></i></button>

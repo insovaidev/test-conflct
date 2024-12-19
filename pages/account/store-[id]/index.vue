@@ -373,18 +373,14 @@
                                     <dt>{{ $t('account_t.engagement') }}:</dt>
                                     <dd> {{ data.insights && data.insights.engagement ? data.insights.engagement : 0 }}</dd>
                                   </div>
+                                  <i v-if="data.shipping" class="bi bi-truck free_deliver_icon" :class="mobileDevice ? '' : '_ml_12'"></i>
                                 </div>
 
                               </dl>
-                              <div class="d-flex" :class="mobileDevice ? 'flex-column align-items-start' : 'align-items-center gap-2'" >
-                                <dl v-if="data.hasOwnProperty('availability') && data.availability == false">
-                                  <i class="unavailable_icon bi bi-ban text-danger"></i>
-                                  <dt>{{ $t('account_t.mark_un') }}</dt>  
-                                </dl>
-                                <dl v-if="data.shipping" class="d-flex align-items-center" >
-                                    <i class="bi bi-truck free_deliver_icon mr-1" ></i> <dt>{{ locale == 'km' ? 'ដឹកជញ្ជូនដោយឥតគិតថ្លៃ' : 'Free Delivery' }}</dt>  
-                                </dl>
-                              </div>
+                              <dl v-if="data.hasOwnProperty('availability') && data.availability == false">
+                                <i class="unavailable_icon bi bi-ban text-danger mr-2"></i>
+                                <dt>{{ $t('account_t.mark_un') }}</dt>  
+                              </dl>
                             </div>
                           </div>
                           <div v-if="data.is_premium && data.premium.type && ['top', 'featured', 'feature'].includes(data.premium.type)" class="position_absolute ad_card_type_premium">
@@ -1549,8 +1545,8 @@
           </div>
           <div class="modal-body modal-body-adsmodal overflow-y-scroll p-2">
             <div class="search-ads-post mb-3" style="position: relative;">
-              <div @click="searchAds()" class="btn border-s-0" style="position:absolute;right:0;top:0;bottom: 0;z-index:1;display: flex;align-items: center;" ><i class="bi bi-search"></i></div>
-              <input type="text" v-model="search_ads" placeholder="Search..." class="form-control more_border" :class="mobileDevice ? 'field-height' : 'dt-field-height'" name="" id="search_Ads" v-on:keyup="keymonitorAds">
+              <div @click="searchAds()" class="btn border-s-0" style="position: absolute; right: 0; top: 0; z-index: 1; background-color: #e9e9e9;" ><i class="bi bi-search"></i></div>
+              <input type="text" v-model="search_ads" placeholder="Search....." class="form-control more_border" :class="mobileDevice ? 'field-height' : 'dt-field-height'" name="" id="search_Ads" v-on:keyup="keymonitorAds">
             </div>
             <div @click="changePaidAdFormData.adid = item.id, navigateMyAdModalContent('#myadsContent'), changeAdSelected = item" :key="item" v-for="item in myAd" class="modal-body_ads_item">
               <div class="modal-body_ads_item_thumnail">

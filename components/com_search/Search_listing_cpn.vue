@@ -1351,6 +1351,7 @@
                                                             <div v-observe-visibility="{
                                                                 callback: (isVisible, entry) => visibilityChanged(isVisible, entry, {
                                                                     id: post.data.id,
+                                                                    category: post.data.category ? post.data.category.id : '',
                                                                     index: index,
                                                                     type: 'list',
                                                                     paid: post.data.type !== 'normal' ? true : false,
@@ -1598,6 +1599,7 @@
                                                                 <div v-observe-visibility="{
                                                                     callback: (isVisible, entry) => visibilityChanged(isVisible, entry, {
                                                                         id: post.data.id,
+                                                                        category: post.data.category ? post.data.category.id : '',
                                                                         index: index,
                                                                         type: 'list',
                                                                         paid: post.data.type !== 'normal' ? true : false,
@@ -1924,6 +1926,7 @@
                                                                 <div v-observe-visibility="{
                                                                     callback: (isVisible, entry) => visibilityChanged(isVisible, entry, {
                                                                         id: post.data.id,
+                                                                        category: post.data.category ? post.data.category.id : '',
                                                                         index: index,
                                                                         type: 'gallery',
                                                                         paid: post.data.type !== 'normal' ? true : false,
@@ -2177,6 +2180,7 @@
                                                                 <div v-observe-visibility="{
                                                                     callback: (isVisible, entry) => visibilityChanged(isVisible, entry, {
                                                                         id: post.data.id,
+                                                                        category: post.data.category ? post.data.category.id : '',
                                                                         index: index,
                                                                         type: 'grid',
                                                                         paid: post.data.type !== 'normal' ? true : false,
@@ -4681,7 +4685,7 @@
   function visibilityChanged (isVisible, entry, data) {
     // isVisible => is true mean new data, false mean old data.
     if (isVisible) { // new data
-      arr_impression.value.push({ id: data.id, current_index: data.index, paid: data.paid, placement: data.placement });
+      arr_impression.value.push({ id: data.id, category: data.category, current_index: data.index, paid: data.paid, placement: data.placement });
 
       // -- timer not exist && arr_impression not empty && check_sent is true, must set interval --
       if (!timer_auto_impression.value && arr_impression.value.length > 0 && check_sent.value) {

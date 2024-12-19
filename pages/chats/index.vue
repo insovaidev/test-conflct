@@ -205,6 +205,10 @@
                                                             </div>
 
                                                             <div v-if="value.type !== 'chat'" class="position_relative ch_thumb_chat_user bg_reload_img">
+                                                                <div class="text-red check_list_store">
+                                                                    <img v-if="value.store && value.store.is_member" :src='value.store && value.store.logo && value.store.logo.medium ? value.store.logo.medium.url : empty_img_user'
+                                                                    :alt="value.user && value.user.name ? value.user.name : ''" class="logo_check_store">
+                                                                </div>
                                                                 <img :src="value.post && value.post.thumbnail ? value.post.thumbnail : empty_img_post"
                                                                     :alt="value.post && value.post.title ? value.post.title : ''" class="ch_thumb_chat_user truncate_wrap" @error="imageUrlAlt_post">
                                                                 <div :class="value.type === 'buy' ? 'position_absolute ch_status_on_action type_buy' : 'position_absolute ch_status_on_action type_sell'">

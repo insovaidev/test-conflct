@@ -96,9 +96,9 @@
                                 <div class="overide_member_ship_plan_card_title">
                                     <p class="mb-0">{{ m.title }}</p>   
                                 </div>
-                                <div class="overide_member_ship_plan_card_status" :class="{'active': m.status == 'active' || m.status == 'success', 'cancelled': m.status == 'cancelled', 'unpaid': m.status == 'unpaid', 'expired': m.status == 'expired', 'nearly_expire': m.status == 'nearly_expire', 'failed': m.status == 'failed', 'awaiting_payment': m.status == 'awaiting_payment'}">
+                                <div class="overide_member_ship_plan_card_status" :class="{'active': m.status == 'active' || m.status == 'success', 'cancelled': m.status == 'cancelled', 'unpaid': m.status == 'unpaid', 'expired': m.status == 'expired', 'nearly_expire': m.status == 'nearly_expire'}">
 
-                                    <p class="mb-0 overide_member_ship_plan_card_status_title"> {{ $t(`account_t.member_ship_status`)}}: <span class="mb-0 overide_member_ship_plan_card_status_title_span text-capitalize" :class="{'active': m.status == 'active' || m.status == 'success', 'cancelled': m.status == 'cancelled', 'unpaid': m.status == 'unpaid', 'nearly_expire': m.status == 'nearly_expire', 'expired': m.status == 'expired', 'failed': m.status == 'failed', 'awaiting_payment': m.status == 'awaiting_payment'}">{{ $t(`account_t.${m.status}`) }}</span> </p>   
+                                    <p class="mb-0 overide_member_ship_plan_card_status_title"> {{ $t(`account_t.member_ship_status`)}}: <span class="mb-0 overide_member_ship_plan_card_status_title_span text-capitalize" :class="{'active': m.status == 'active' || m.status == 'success', 'cancelled': m.status == 'cancelled', 'unpaid': m.status == 'unpaid', 'nearly_expire': m.status == 'nearly_expire', 'expired': m.status == 'expired'}">{{ $t(`account_t.${m.status}`) }}</span> </p>   
                                     
                                     <p class="mb-0 overide_member_ship_plan_card_status_valid_date">{{  $t(`account_t.valid_until`)}}: {{forMatDate(m.end_date, locale) }}</p>   
                                 </div>

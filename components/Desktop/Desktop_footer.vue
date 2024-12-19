@@ -50,15 +50,9 @@
                             </div>
                         </div>
                     </li>
-
                 </ul>
-                <div class="footer-payment-method">
-                    <p class="mb-0 text-capitalize" > {{  locale == 'km' ? 'យើងទទួលយក: ' : 'We accept: ' }}  </p>
-                    <div  class="img-container">
-                        <img src="public/icon/s-aba-khqr.png" alt="/public/icons/s-aba-khqr.png" />
-                    </div>
-                </div>
             </div>
+            <!-- <p class="copy-right text-center p-2 m-0 copyright">Copyright ©2021 <NuxtLink :to="localePath({ name: 'index' })" class="text_white">KHMER24</NuxtLink> (Cambodia). All rights reserved.</p> -->
         </div>
     </footer>
 </template>

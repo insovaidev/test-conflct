@@ -402,6 +402,7 @@ export default {
             data_sent['data'] = JSON.stringify({ "type":"category", "id": data.id });
             // ---- impression ----
         } else if (type === 'impression') {
+            // console.log(data)
             $.each( data.post_impression, ( key, value ) => {
                 let c_data = { "type": "post", "id": value.id, "current_index": value.current_index+1, "item_count": data.item_count, "item_per_page": data.item_per_page };
                 if (value.paid) { c_data['paid'] = true; }

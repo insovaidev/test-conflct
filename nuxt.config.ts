@@ -1,52 +1,37 @@
 import en from './locales/en.json'
 import km from './locales/km.json'
-const version = process.env.LIBRARY_VERSION
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   // devtools: true,
   // devServer: {
   //   host: '0.0.0.0',
-  //   port: 3000
+  //   port: process.env.DEV_PORT
   // },
-
   hooks: {
-    // 'pages:extend' (pages) {
-    //   pages.push({
-    //     name: '/index',
-    //     path: '/index',
-    //     file: '~/pages/index.vue'
-    //   })
-    //   pages.push({
-    //     name: '/index.html',
-    //     path: '/index.html',
-    //     file: '~/pages/index.vue'
-    //   })
-    //   pages.push({
-    //     name: '/en.html',
-    //     path: '/en.html',
-    //     file: '~/pages/index.vue'
-    //   })
-    //   pages.push({
-    //     name: '/km.html',
-    //     path: '/km.html',
-    //     file: '~/pages/index.vue'
-    //   })
-    // }
-  },
-
-  css: [
-    `~/public/${version}/my_css/premium_account.css`
-  ],
-
-  app: {
-    head: {
-      script: [
-        {src: 'https://checkout.payway.com.kh/plugins/checkout2-0.js', defer: true}
-      ]
+    'pages:extend' (pages) {
+      pages.push({
+        name: '/index',
+        path: '/index',
+        file: '~/pages/index.vue'
+      })
+      pages.push({
+        name: '/index.html',
+        path: '/index.html',
+        file: '~/pages/index.vue'
+      })
+      pages.push({
+        name: '/en.html',
+        path: '/en.html',
+        file: '~/pages/index.vue'
+      })
+      pages.push({
+        name: '/km.html',
+        path: '/km.html',
+        file: '~/pages/index.vue'
+      })
     }
   },
-
   modules: [
     '@nuxtjs/i18n',
     '@nuxtjs/device',
@@ -73,7 +58,6 @@ export default defineNuxtConfig({
     defaultLocale: '/',
     fallbackLocale: 'en',
   },
-
   device: {
     refreshOnResize: true
   },
@@ -112,10 +96,9 @@ export default defineNuxtConfig({
     }
 
   },
-
+  
   // -- server CPU lack, maybe "Sourcemap: true" --
-  // close error warning sourcemap in console client side and prevent build javascript memory lack.
-  sourcemap: false,
+  sourcemap: false, // close error warning sourcemap in console client side and prevent build javascript memory lack.
 
   // -- prevent build warning --
   // builder: 'vite',
@@ -123,7 +106,6 @@ export default defineNuxtConfig({
     build: {
       chunkSizeWarningLimit: 9000
     }
-  },
+  }
 
-  compatibilityDate: '2024-12-03'
 })

@@ -75,21 +75,20 @@
                             <div class="account_sub_detail_card_descrition text-capitalize p-3 ">
                                 <div class="">
                                     <p class="mb-0 account_sub_his_in_sub_card_title">{{ mySubState.plan_title ? mySubState.plan_title : '' }}</p>
-                                    <span class="account_sub_create_at">{{ forMatDate(mySubState.end_date, locale)}}</span>
-                                    <div class="d-flex align-items-center justify-content-start account_sub_start_valid" >
-                                            <div class="d-flex flex-column mr-1">
-                                                <span class="sub_his_date_label">{{ $t('account_t.valid_from') }}:</span>
-                                                <span class="sub_his_date_label">{{ $t('account_t.valid_until') }}:</span> 
-                                            </div>
-                                            <div class="d-flex flex-column ">
-                                                <span class="account_sub_card_valid">{{ forMatDate(mySubState.start_date, locale)}}</span>
-                                                <span class="account_sub_card_valid">{{ forMatDate(mySubState.end_date, locale)}}</span>
-                                            </div>
-                                        </div>            
+                                    <div class="d-flex align-items-center justify-content-start" >
+                                        <div class="d-flex flex-column mr-1">
+                                            <span class="sub_his_date_label">{{ $t('account_t.valid_from') }}</span>
+                                            <span class="sub_his_date_label">{{ $t('account_t.valid_until') }}</span> 
+                                        </div>
+                                        <div class="d-flex flex-column ">
+                                            <span class="account_sub_card_valid">{{ forMatDate(mySubState.start_date, locale)}}</span>
+                                            <span class="account_sub_card_valid">{{ forMatDate(mySubState.end_date, locale)}}</span>
+                                        </div>
+                                    </div>            
                                     </div>
                                     <p class="mb-0 account_sub_card_status" :class="mySubState.status ? mySubState.status : ''">{{ $t(`account_t.${mySubState.status}`) }}</p>
                                     <p class="mb-0 account_sub_card_price">${{ formatAmount(mySubState.price)}}</p>
-                                </div>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <div v-show="!mobileDevice && !isLoading">
@@ -111,11 +110,10 @@
                                         <div class="account_sub_detail_card_descrition text-capitalize" :class="mobileDevice ? 'sub_his_overide_font_size' : ''" >
                                             <div class="_mb_8">
                                                 <p class="mb-0 account_sub_his_card_plan_title">{{ his.plan_title ? his.plan_title : '' }}</p>
-                                                <span class="account_sub_create_at">{{ forMatDate(mySubState.end_date, locale)}}</span>
-                                                <div class="d-flex align-items-center justify-content-start account_sub_start_valid" >
+                                                <div class="d-flex align-items-center justify-content-start" >
                                                     <div class="d-flex flex-column mr-1">
-                                                        <span class="sub_his_date_label">{{ $t('account_t.valid_from') }}:</span>
-                                                        <span class="sub_his_date_label">{{ $t('account_t.valid_until') }}:</span> 
+                                                        <span class="sub_his_date_label">{{ $t('account_t.valid_from') }}</span>
+                                                        <span class="sub_his_date_label">{{ $t('account_t.valid_until') }}</span> 
                                                     </div>
                                                     <div class="d-flex flex-column ">
                                                         <span class="account_sub_card_valid">{{forMatDate(his.start_date, locale)}}</span>
@@ -125,7 +123,7 @@
                                                 <p class="mb-0 account_sub_his_card_status" :class="his.status">{{ $t(`account_t.${his.status}`) }}</p>
                                                 <p class="mb-0 account_sub_his_card_price">${{ formatAmount(his.price) }}</p>
                                             </div>
-                                            <p class="mb-0 account_sub_his_card_order_detail">{{ $t('account_t.order_details') }}<i class="bi bi-chevron-right account_sub_detail_icon"></i></p>
+                                            <p class="mb-0 account_sub_his_card_order_detail">{{ $t('account_t.order_details') }}<i class="ml-2 bi bi-chevron-right"></i></p>
                                         </div>
                                     </NuxtLink>
                                 </div>  
